@@ -1,0 +1,16 @@
+#POST http://localhost:5007/saa
+POST https://z1vszrq1o7.execute-api.eu-west-2.amazonaws.com/Prod/questions
+Content-Type: application/json
+
+{
+  "firstName": "LYNDA",
+  "surname": "DUPHIE",
+  "title": "MRS",
+  "houseNo": 83,
+  "postcode": "AL10 0BY",
+  "dobDD": "12",
+  "dobMM": "6",
+  "dobCCYY": "1952"
+}
+
+###
