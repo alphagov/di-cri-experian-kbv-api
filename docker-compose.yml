@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+
+  experian-api:
+    container_name: experian-api
+    build:
+      dockerfile: Dockerfile
+      context: .
+    environment:
+      - KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
+    ports:
+      - "7100:5007"
+      - "7102:5009"
+
+    networks:
+      - cri-kbv
+
+networks:
+  cri-kbv:
