@@ -13,7 +13,6 @@ plugins {
 	id "com.diffplug.spotless" version "6.0.4"
 	id "io.swagger.core.v3.swagger-gradle-plugin" version "2.1.11"
 	id 'com.github.bjornvester.wsdl2java' version '1.2'
-	id "org.sonarqube" version "3.3"
 }
 
 group "uk.gov.di.cri.experian.kbv.api"
@@ -71,15 +70,6 @@ wsdl2java {
 		'wsdl/iiq-wasp-token.wsdl',
 		'wsdl/iiq-service.wsdl'
 	]
-}
-
-sonarqube {
-	properties {
-		property "sonar.projectKey", "alphagov_di-cri-experian-kbv-api"
-		property "sonar.organization", "alphagov"
-		property "sonar.host.url", "https://sonarcloud.io"
-		property "sonar.sources", "src/main/java/**/*.java"
-	}
 }
 
 sourceSets.main.java.srcDirs = [
