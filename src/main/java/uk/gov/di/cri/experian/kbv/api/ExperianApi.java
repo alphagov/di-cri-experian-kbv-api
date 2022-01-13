@@ -17,6 +17,9 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
+
 public class ExperianApi {
     private final HealthCheckResource healthCheckResource;
     private final QuestionResource questionResource;

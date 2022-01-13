@@ -13,6 +13,7 @@ import java.util.Objects;
 
 public class KBVGateway {
 
+    private final HttpClient httpClient;
     private final SAARequestMapper saaRequestMapper;
     private final ResponseToQuestionMapper responseToQuestionMapper;
     private final KbvSoapWebServiceClient kbvSoapWebServiceClient;
@@ -32,9 +33,153 @@ public class KBVGateway {
     public QuestionResponse getQuestions(PersonIdentity personIdentity) {
         Object saaRequest = this.saaRequestMapper.mapPersonIdentity(personIdentity);
 
-        // TODO: make the call to the experian SAA endpoint
+        SAARequestDto apiRequest = saaRequestMapper.mapPersonIdentity(personIdentity);
 
-        return null;
+        IdentityIQWebServiceSoap soapEndpoint = getIdentityIQWebServiceSoapEndpoint(getToken());
+        SAAResponse2 saaResponse2 = getSaaResponse2(soapEndpoint, apiRequest);
+        System.out.println(saaResponse2);
+        QuestionsResponse result =
+                saaRequestMapper.mapSAAResponse2ToQuestionsResponse(saaResponse2);
+
+        return result;
+    }
+
+    private IdentityIQWebServiceSoap getIdentityIQWebServiceSoapEndpoint(String token)
+            throws UnsupportedEncodingException {
+        IdentityIQWebService service = new IdentityIQWebService();
+        service.setHandlerResolver(new HeaderHandlerResolver(token));
+        IdentityIQWebServiceSoap soapEndpoint = service.getIdentityIQWebServiceSoap();
+        return soapEndpoint;
+    }
+
+    private String getToken() throws UnsupportedEncodingException {
+        TokenService tokenService = new TokenService();
+        TokenServiceSoap tokenServiceSoap = tokenService.getTokenServiceSoap();
+        String token = tokenServiceSoap.loginWithCertificate("GDS DI", true);
+        if (token == null || token.contains("Error")) {
+            throw new RuntimeException(token);
+        }
+        return Base64.getEncoder().encodeToString(token.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private SAAResponse2 getSaaResponse2(
+            IdentityIQWebServiceSoap soapEndpoint, SAARequestDto saaRequestDto)
+            throws UnsupportedEncodingException {
+        SAARequest saaRequest = createRequest(saaRequestDto);
+        SAAResponse2 result = soapEndpoint.saa(saaRequest);
+        return result;
+    }
+
+    private SAARequest createRequest(SAARequestDto dto) {
+        SAARequest saaRequest = new SAARequest();
+        setApplicant(saaRequest, dto);
+        setApplicationData(saaRequest);
+        setControl(saaRequest);
+        setLocationDetails(saaRequest, dto);
+        setResidency(saaRequest);
+        return saaRequest;
+    }
+
+    private void setResidency(SAARequest saaRequest) {
+        Residency residency = new Residency();
+        residency.setApplicantIdentifier(1);
+        residency.setLocationIdentifier(1);
+        saaRequest.getResidency().add(residency);
+    }
+
+    private void setApplicationData(SAARequest saaRequest) {
+        ApplicationData applicationData = new ApplicationData();
+        applicationData.setApplicationType("IG");
+        applicationData.setChannel("IN");
+        applicationData.setSearchConsent("Y");
+        applicationData.setProduct("3 out of 4");
+        saaRequest.setApplicationData(applicationData);
+    }
+
+    private void setControl(SAARequest saaRequest) {
+        saaRequest.setControl(createControl());
+    }
+
+    private Control createControl() {
+        Control control = new Control();
+        control.setTestDatabase("A");
+        Parameters parameters = new Parameters();
+        parameters.setOneShotAuthentication("N");
+        parameters.setStoreCaseData("P");
+        control.setParameters(parameters);
+        control.setURN(UUID.randomUUID().toString());
+        control.setOperatorID("GDSCABINETUIIQ01U");
+        return control;
+    }
+
+    private void setApplicant(SAARequest saaRequest, SAARequestDto dto) {
+        Applicant applicant = new Applicant();
+        applicant.setApplicantIdentifier("1");
+        ApplicantName name = new ApplicantName();
+
+        if (StringUtils.isNotBlank(dto.getFirstName())) {
+            name.setForename(dto.getFirstName());
+        }
+
+        if (StringUtils.isNotBlank(dto.getSurname())) {
+            name.setSurname(dto.getSurname());
+        }
+
+        if (StringUtils.isNotBlank(dto.getTitle())) {
+            name.setTitle(dto.getTitle());
+        }
+
+        applicant.setName(name);
+        ApplicantDateOfBirth dateOfBirth = new ApplicantDateOfBirth();
+
+        if (StringUtils.isNotBlank(dto.getDobDD())) {
+            dateOfBirth.setDD(Integer.parseInt(dto.getDobDD()));
+        }
+
+        if (StringUtils.isNotBlank(dto.getDobMM())) {
+            dateOfBirth.setMM(Integer.parseInt(dto.getDobMM()));
+        }
+
+        if (StringUtils.isNotBlank(dto.getDobCCYY())) {
+            dateOfBirth.setCCYY(Integer.parseInt(dto.getDobCCYY()));
+        }
+        applicant.setDateOfBirth(dateOfBirth);
+
+        saaRequest.setApplicant(applicant);
+    }
+
+    private void setLocationDetails(SAARequest saaRequest, SAARequestDto dto) {
+        LocationDetails locationDetails = new LocationDetails();
+        locationDetails.setLocationIdentifier(1);
+        LocationDetailsUKLocation ukLocation = new LocationDetailsUKLocation();
+
+        if (StringUtils.isNotBlank(dto.getPostcode())) {
+            ukLocation.setPostcode(dto.getPostcode());
+        }
+
+        if (StringUtils.isNotBlank(dto.getDistrict())) {
+            ukLocation.setDistrict(dto.getDistrict());
+        }
+
+        if (StringUtils.isNotBlank(dto.getFlat())) {
+            ukLocation.setFlat(dto.getFlat());
+        }
+
+        if (StringUtils.isNotBlank(dto.getPostTown())) {
+            ukLocation.setPostTown(dto.getPostTown());
+        }
+
+        if (StringUtils.isNotBlank(dto.getStreet())) {
+            ukLocation.setStreet(dto.getStreet());
+        }
+
+        if (StringUtils.isNotBlank(dto.getHouseNo())) {
+            ukLocation.setHouseNumber(dto.getHouseNo());
+        }
+
+        locationDetails.setUKLocation(ukLocation);
+        //        locationDetails.setClientLocationID("1");
+        saaRequest.getLocationDetails().add(locationDetails);
     }
 
     public QuestionAnswerResponse submitAnswers(QuestionAnswerRequest questionAnswerRequest)

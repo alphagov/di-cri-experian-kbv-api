@@ -10,6 +10,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class PersonIdentity {
+    @NotBlank(message = "{personIdentity.title.required}")
+    private String title;
+
     @NotBlank(message = "{personIdentity.firstname.required}")
     private String firstName;
 
@@ -26,6 +29,14 @@ public class PersonIdentity {
     @NotNull(message = "{personIdentity.addresses.required}")
     @NotEmpty(message = "{personIdentity.addresses.required}")
     private List<PersonAddress> addresses;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getFirstName() {
         return firstName;
