@@ -39,7 +39,9 @@ public class QuestionAnswerResource {
 
                 if (validationResult.isValid()) {
                     responseStatusCode = HttpServletResponse.SC_OK;
-                    responseBody = this.kbvService.submitAnswers(questionsAnswersRequest);
+                    responseBody =
+                            objectMapper.writeValueAsString(
+                                    this.kbvService.submitAnswers(questionsAnswersRequest));
                 } else {
                     responseStatusCode = HttpServletResponse.SC_BAD_REQUEST;
                     responseBody = objectMapper.writeValueAsString(validationResult);

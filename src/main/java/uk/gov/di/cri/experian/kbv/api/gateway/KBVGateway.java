@@ -1,43 +1,32 @@
 package uk.gov.di.cri.experian.kbv.api.gateway;
 
+import com.experian.uk.schema.experian.identityiq.services.webservice.IdentityIQWebServiceSoap;
 import com.experian.uk.schema.experian.identityiq.services.webservice.RTQRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import uk.gov.di.cri.experian.kbv.api.config.KbvApiConfig;
+import com.experian.uk.schema.experian.identityiq.services.webservice.RTQResponse2;
 import uk.gov.di.cri.experian.kbv.api.domain.PersonIdentity;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
+import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionResponse;
+import uk.gov.di.cri.experian.kbv.api.security.KbvSoapWebServiceClient;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Objects;
 
 public class KBVGateway {
 
     private final SAARequestMapper saaRequestMapper;
-    private final RTQRequestMapper rtqRequestMapper;
-    private final ObjectMapper objectMapper;
-    private final KbvApiConfig kbvApiConfig;
-    private final HttpClient httpClient;
+    private final ResponseToQuestionMapper responseToQuestionMapper;
+    private final KbvSoapWebServiceClient kbvSoapWebServiceClient;
 
     public KBVGateway(
             SAARequestMapper saaRequestMapper,
-            RTQRequestMapper rtqRequestMapper,
-            HttpClient httpClient,
-            ObjectMapper objectMapper,
-            KbvApiConfig kbvApiConfig) {
-        Objects.requireNonNull(httpClient, "httpClient must not be null");
+            ResponseToQuestionMapper responseToQuestionMapper,
+            KbvSoapWebServiceClient kbvSoapWebServiceClient) {
+        Objects.requireNonNull(kbvSoapWebServiceClient, "httpClient must not be null");
         Objects.requireNonNull(saaRequestMapper, "saaRequestMapper must not be null");
-        Objects.requireNonNull(objectMapper, "objectMapper must not be null");
-        Objects.requireNonNull(rtqRequestMapper, "rtqRequestMapper must not be null");
-        Objects.requireNonNull(kbvApiConfig, "crossCoreApiConfig must not be null");
+        Objects.requireNonNull(responseToQuestionMapper, "rtqRequestMapper must not be null");
         this.saaRequestMapper = saaRequestMapper;
-        this.rtqRequestMapper = rtqRequestMapper;
-        this.httpClient = httpClient;
-        this.objectMapper = objectMapper;
-        this.kbvApiConfig = kbvApiConfig;
+        this.responseToQuestionMapper = responseToQuestionMapper;
+        this.kbvSoapWebServiceClient = kbvSoapWebServiceClient;
     }
 
     public QuestionResponse getQuestions(PersonIdentity personIdentity) {
@@ -48,22 +37,15 @@ public class KBVGateway {
         return null;
     }
 
-    public String submitAnswers(QuestionAnswerRequest questionAnswers)
-            throws IOException, InterruptedException {
-        RTQRequest rtqRequest = this.rtqRequestMapper.mapQuestionAnswersRtqRequest(questionAnswers);
-        String requestBody = objectMapper.writeValueAsString(rtqRequest);
+    public QuestionAnswerResponse submitAnswers(QuestionAnswerRequest questionAnswerRequest)
+            throws InterruptedException {
+        RTQRequest rtqRequest =
+                this.responseToQuestionMapper.mapQuestionAnswersRtqRequest(questionAnswerRequest);
 
-        HttpRequest request =
-                HttpRequest.newBuilder()
-                        .uri(URI.create(kbvApiConfig.getEndpointUri()))
-                        .setHeader("Accept", "application/json")
-                        .setHeader("Content-Type", "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                        .build();
-
-        HttpResponse<String> response =
-                httpClient.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
-
-        return response.body();
+        IdentityIQWebServiceSoap identityIQWebServiceSoap =
+                kbvSoapWebServiceClient.getIdentityIQWebServiceSoapEndpoint();
+        RTQResponse2 rtqResponse2 = identityIQWebServiceSoap.rtq(rtqRequest);
+        return this.responseToQuestionMapper.mapResultsToMapQuestionAnswersResponse(
+                rtqResponse2.getResults());
     }
 }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
+import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
 import uk.gov.di.cri.experian.kbv.api.domain.ValidationResult;
 import uk.gov.di.cri.experian.kbv.api.service.KBVService;
 import uk.gov.di.cri.experian.kbv.api.validation.InputValidationExecutor;
@@ -40,7 +41,7 @@ class QuestionAnswerResourceTest {
     @Test
     void returns200OkWhenSubmitQuestionAnswerHasValidInput() throws Exception {
         final String theRequestBody = "request-body";
-        final String submitAnswerResponseBody = "submit-answer-response-body";
+        final QuestionAnswerResponse submitAnswerResponseBody = mock(QuestionAnswerResponse.class);
 
         spark.Request mockRequest = mock(spark.Request.class);
         spark.Response mockResponse = mock(spark.Response.class);
@@ -52,11 +53,13 @@ class QuestionAnswerResourceTest {
                 .thenReturn(new ValidationResult(Collections.emptyList()));
         when(mockKbvService.submitAnswers(testAnswerRequest)).thenReturn(submitAnswerResponseBody);
         when(mockRequest.body()).thenReturn(theRequestBody);
+        when(mockObjectMapper.writeValueAsString(submitAnswerResponseBody))
+                .thenReturn("submitAnswerResponseBody");
 
         questionAnswerResource.submitQuestionsAnswers.handle(mockRequest, mockResponse);
         verify(mockResponse).status(HttpServletResponse.SC_OK);
         verify(mockResponse).header("Content-Type", "application/json");
-        verify(mockResponse).body(submitAnswerResponseBody);
+        verify(mockResponse).body("submitAnswerResponseBody");
     }
 
     @Test

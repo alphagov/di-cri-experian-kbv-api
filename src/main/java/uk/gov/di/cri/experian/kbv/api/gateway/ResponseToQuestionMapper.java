@@ -4,14 +4,16 @@ import com.experian.uk.schema.experian.identityiq.services.webservice.Control;
 import com.experian.uk.schema.experian.identityiq.services.webservice.RTQRequest;
 import com.experian.uk.schema.experian.identityiq.services.webservice.Response;
 import com.experian.uk.schema.experian.identityiq.services.webservice.Responses;
+import com.experian.uk.schema.experian.identityiq.services.webservice.Results;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswer;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
+import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class RTQRequestMapper {
+public class ResponseToQuestionMapper {
     public RTQRequest mapQuestionAnswersRtqRequest(QuestionAnswerRequest questionAnswers) {
         Objects.requireNonNull(questionAnswers, "The QuestionAnswerRequest must not be null");
 
@@ -23,6 +25,18 @@ public class RTQRequestMapper {
         rtqRequest.setControl(getControl(questionAnswers));
         rtqRequest.setResponses(responses);
         return rtqRequest;
+    }
+
+    public QuestionAnswerResponse mapResultsToMapQuestionAnswersResponse(Results results) {
+        QuestionAnswerResponse questionAnswerResponse = new QuestionAnswerResponse();
+
+        questionAnswerResponse.setQuestions(results.getQuestions());
+        questionAnswerResponse.setAlerts(results.getAlerts());
+        questionAnswerResponse.setAuthenticationResult(results.getAuthenticationResult());
+        questionAnswerResponse.setOutcome(results.getOutcome());
+        questionAnswerResponse.setNextTransId(results.getNextTransId());
+
+        return questionAnswerResponse;
     }
 
     private Control getControl(QuestionAnswerRequest questionAnswers) {

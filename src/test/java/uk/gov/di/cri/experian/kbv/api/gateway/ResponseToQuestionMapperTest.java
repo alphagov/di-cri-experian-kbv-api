@@ -10,20 +10,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class RTQRequestMapperTest {
-    private RTQRequestMapper rtqRequestMapper;
+class ResponseToQuestionMapperTest {
+    private ResponseToQuestionMapper responseToQuestionMapper;
     private QuestionAnswerRequest questionAnswerRequest;
 
     @BeforeEach
     void setup() {
-        rtqRequestMapper = new RTQRequestMapper();
+        responseToQuestionMapper = new ResponseToQuestionMapper();
     }
 
     @Test
     void shouldConvertAnAnswerQuestionRequestInToARtqRequest() {
         questionAnswerRequest = TestDataCreator.createTestQuestionAnswerRequest();
 
-        RTQRequest result = rtqRequestMapper.mapQuestionAnswersRtqRequest(questionAnswerRequest);
+        RTQRequest result =
+                responseToQuestionMapper.mapQuestionAnswersRtqRequest(questionAnswerRequest);
 
         assertNotNull(result);
 
@@ -42,7 +43,9 @@ class RTQRequestMapperTest {
         NullPointerException exception =
                 assertThrows(
                         NullPointerException.class,
-                        () -> rtqRequestMapper.mapQuestionAnswersRtqRequest(questionAnswerRequest));
+                        () ->
+                                responseToQuestionMapper.mapQuestionAnswersRtqRequest(
+                                        questionAnswerRequest));
         assertEquals("The QuestionAnswerRequest must not be null", exception.getMessage());
     }
 }

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.di.cri.experian.kbv.api.domain.PersonIdentity;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
+import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionResponse;
 import uk.gov.di.cri.experian.kbv.api.gateway.KBVGateway;
 
@@ -24,8 +25,8 @@ public class KBVService {
             return null;
         }
     }
-
-    public String submitAnswers(QuestionAnswerRequest answers) {
+    // TODO: This should be a QuestionAnswerResponse
+    public QuestionAnswerResponse submitAnswers(QuestionAnswerRequest answers) {
         try {
             return kbvGateway.submitAnswers(answers);
         } catch (InterruptedException ie) {
