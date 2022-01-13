@@ -15,16 +15,6 @@ public class QuestionAnswerResource {
     private InputValidationExecutor inputValidationExecutor;
     private KBVService kbvService;
     private ObjectMapper objectMapper;
-
-    public QuestionAnswerResource(
-            KBVService kbvService,
-            ObjectMapper objectMapper,
-            InputValidationExecutor inputValidationExecutor) {
-        this.objectMapper = objectMapper;
-        this.inputValidationExecutor = inputValidationExecutor;
-        this.kbvService = kbvService;
-    }
-
     public final Route submitQuestionsAnswers =
             (Request request, Response response) -> {
                 QuestionAnswerRequest questionsAnswersRequest =
@@ -51,6 +41,15 @@ public class QuestionAnswerResource {
                 response.body(responseBody);
                 return response.body();
             };
+
+    public QuestionAnswerResource(
+            KBVService kbvService,
+            ObjectMapper objectMapper,
+            InputValidationExecutor inputValidationExecutor) {
+        this.objectMapper = objectMapper;
+        this.inputValidationExecutor = inputValidationExecutor;
+        this.kbvService = kbvService;
+    }
 
     public QuestionAnswerResource() {}
 }

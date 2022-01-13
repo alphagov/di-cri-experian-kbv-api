@@ -45,7 +45,6 @@ public class KBVGateway {
         IdentityIQWebServiceSoap identityIQWebServiceSoap =
                 kbvSoapWebServiceClient.getIdentityIQWebServiceSoapEndpoint();
         RTQResponse2 rtqResponse2 = identityIQWebServiceSoap.rtq(rtqRequest);
-        return this.responseToQuestionMapper.mapResultsToMapQuestionAnswersResponse(
-                rtqResponse2.getResults());
+        return this.responseToQuestionMapper.mapResultsToMapQuestionAnswersResponse(rtqResponse2);
     }
 }

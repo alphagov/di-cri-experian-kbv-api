@@ -2,9 +2,9 @@ package uk.gov.di.cri.experian.kbv.api.gateway;
 
 import com.experian.uk.schema.experian.identityiq.services.webservice.Control;
 import com.experian.uk.schema.experian.identityiq.services.webservice.RTQRequest;
+import com.experian.uk.schema.experian.identityiq.services.webservice.RTQResponse2;
 import com.experian.uk.schema.experian.identityiq.services.webservice.Response;
 import com.experian.uk.schema.experian.identityiq.services.webservice.Responses;
-import com.experian.uk.schema.experian.identityiq.services.webservice.Results;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswer;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
@@ -27,14 +27,13 @@ public class ResponseToQuestionMapper {
         return rtqRequest;
     }
 
-    public QuestionAnswerResponse mapResultsToMapQuestionAnswersResponse(Results results) {
+    public QuestionAnswerResponse mapResultsToMapQuestionAnswersResponse(RTQResponse2 results) {
         QuestionAnswerResponse questionAnswerResponse = new QuestionAnswerResponse();
 
         questionAnswerResponse.setQuestions(results.getQuestions());
-        questionAnswerResponse.setAlerts(results.getAlerts());
-        questionAnswerResponse.setAuthenticationResult(results.getAuthenticationResult());
-        questionAnswerResponse.setOutcome(results.getOutcome());
-        questionAnswerResponse.setNextTransId(results.getNextTransId());
+        questionAnswerResponse.setResults(results.getResults());
+        questionAnswerResponse.setControl(results.getControl());
+        questionAnswerResponse.setError(results.getError());
 
         return questionAnswerResponse;
     }
