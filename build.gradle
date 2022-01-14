@@ -64,13 +64,6 @@ spotless {
 	}
 }
 
-wsdl2java {
-	includes = [
-		'wsdl/iiq-wasp-token.wsdl',
-		'wsdl/iiq-service.wsdl'
-	]
-}
-
 sourceSets.main.java.srcDirs = [
 	'src/main/java',
 	'src/build/generated/sources/wsdl2java'

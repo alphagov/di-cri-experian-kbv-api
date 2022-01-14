@@ -24,7 +24,7 @@ public class ExperianApi {
 
     public ExperianApi() {
         try {
-            Spark.port(5008);
+            Spark.port(8080);
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
 
