@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import spark.Spark;
 import uk.gov.di.cri.experian.kbv.api.gateway.KBVGateway;
+import uk.gov.di.cri.experian.kbv.api.gateway.ResponseToQuestionMapper;
 import uk.gov.di.cri.experian.kbv.api.gateway.SAARequestMapper;
 import uk.gov.di.cri.experian.kbv.api.resource.HealthCheckResource;
 import uk.gov.di.cri.experian.kbv.api.resource.QuestionAnswerResource;
 import uk.gov.di.cri.experian.kbv.api.resource.QuestionResource;
+import uk.gov.di.cri.experian.kbv.api.security.KBVClientFactory;
 import uk.gov.di.cri.experian.kbv.api.service.KBVService;
 import uk.gov.di.cri.experian.kbv.api.validation.InputValidationExecutor;
 
@@ -22,8 +24,7 @@ public class ExperianApi {
 
     public ExperianApi() {
         try {
-            Spark.port(5007);
-
+            Spark.port(8080);
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
 
@@ -37,7 +38,8 @@ public class ExperianApi {
             KBVService kbvService = createKbvService();
             this.questionResource =
                     new QuestionResource(kbvService, objectMapper, inputValidationExecutor);
-            this.questionAnswerResource = new QuestionAnswerResource();
+            this.questionAnswerResource =
+                    new QuestionAnswerResource(kbvService, objectMapper, inputValidationExecutor);
 
             mapRoutes();
         } catch (Exception e) {
@@ -49,10 +51,14 @@ public class ExperianApi {
     private void mapRoutes() {
         Spark.get("/healthcheck", this.healthCheckResource.getCurrentHealth);
         Spark.post("/question-request", this.questionResource.getQuestions);
-        Spark.post("/question-answer", this.questionAnswerResource.submitQuestionAnswers);
+        Spark.post("/question-answer", this.questionAnswerResource.submitQuestionsAnswers);
     }
 
     private KBVService createKbvService() {
-        return new KBVService(new KBVGateway(new SAARequestMapper()));
+        return new KBVService(
+                new KBVGateway(
+                        new SAARequestMapper(),
+                        new ResponseToQuestionMapper(),
+                        KBVClientFactory.createClient("GDS DI", true)));
     }
 }

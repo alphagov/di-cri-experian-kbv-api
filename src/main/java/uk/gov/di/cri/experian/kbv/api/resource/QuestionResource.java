@@ -5,7 +5,7 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 import uk.gov.di.cri.experian.kbv.api.domain.PersonIdentity;
-import uk.gov.di.cri.experian.kbv.api.domain.QuestionsResponse;
+import uk.gov.di.cri.experian.kbv.api.domain.QuestionResponse;
 import uk.gov.di.cri.experian.kbv.api.domain.ValidationResult;
 import uk.gov.di.cri.experian.kbv.api.service.KBVService;
 import uk.gov.di.cri.experian.kbv.api.validation.InputValidationExecutor;
@@ -39,7 +39,7 @@ public class QuestionResource {
                 int responseStatusCode;
 
                 if (validationResult.isValid()) {
-                    QuestionsResponse questionsResponse =
+                    QuestionResponse questionsResponse =
                             this.kbvService.getQuestions(personIdentity);
                     responseStatusCode = HttpServletResponse.SC_OK;
                     responseBody = objectMapper.writeValueAsString(questionsResponse);

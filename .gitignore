@@ -24,8 +24,6 @@ hs_err_pid*
 
 # Ignore Gradle project-specific cache directory
 .gradle
-
-# Ignore Gradle build output directory
 build
 
 # IntelliJ project files
@@ -33,3 +31,13 @@ build
 
 # gradle wrapper jar
 !gradle/wrapper/gradle-wrapper.jar
+**/gradle/
+*.iml
+.DS_Store
+**/build/
+
+kbv-api/build
+kbv-api/src/main/resources/data
+
+.env
+.http
