@@ -9,10 +9,13 @@ plugins {
 }
 
 group "uk.gov.di.cri.experian.kbv.api"
+
 repositories {
 	mavenCentral()
 }
+
 sourceCompatibility = 11
+
 dependencies {
 	implementation 'org.apache.cxf:cxf-rt-frontend-jaxws:3.4.5'
 	implementation 'org.apache.cxf:cxf-rt-transports-http:3.4.5'
@@ -45,6 +48,7 @@ jacocoTestReport {
 		xml.enabled true
 	}
 }
+
 spotless {
 	java {
 		target "src/**/*.java"
