@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.di.cri.experian.kbv.api.domain.PersonIdentity;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
-import uk.gov.di.cri.experian.kbv.api.domain.QuestionResponse;
+import uk.gov.di.cri.experian.kbv.api.domain.QuestionsResponse;
 import uk.gov.di.cri.experian.kbv.api.gateway.KBVGateway;
 
 public class KBVService {
@@ -17,7 +17,7 @@ public class KBVService {
         this.kbvGateway = kbvGateway;
     }
 
-    public QuestionResponse getQuestions(PersonIdentity personIdentity) {
+    public QuestionsResponse getQuestions(PersonIdentity personIdentity) {
         try {
             return this.kbvGateway.getQuestions(personIdentity);
         } catch (Exception e) {
@@ -25,7 +25,7 @@ public class KBVService {
             return null;
         }
     }
-    // TODO: This should be a QuestionAnswerResponse
+    
     public QuestionAnswerResponse submitAnswers(QuestionAnswerRequest answers) {
         try {
             return kbvGateway.submitAnswers(answers);
