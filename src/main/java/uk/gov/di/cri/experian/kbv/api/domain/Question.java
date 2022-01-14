@@ -2,7 +2,7 @@ package uk.gov.di.cri.experian.kbv.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Questions {
+public class Question {
 
     @JsonProperty private String questionID;
 

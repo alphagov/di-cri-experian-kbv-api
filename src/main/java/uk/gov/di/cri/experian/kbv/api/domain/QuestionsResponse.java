@@ -1,38 +1,46 @@
 package uk.gov.di.cri.experian.kbv.api.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.List;
+import com.experian.uk.schema.experian.identityiq.services.webservice.Control;
+import com.experian.uk.schema.experian.identityiq.services.webservice.Error;
+import com.experian.uk.schema.experian.identityiq.services.webservice.Questions;
+import com.experian.uk.schema.experian.identityiq.services.webservice.Results;
 
 public class QuestionsResponse {
 
-    @JsonProperty private String urn;
+    protected Control control;
+    protected Questions questions;
+    protected Results results;
+    protected Error error;
 
-    @JsonProperty private String authRefNo;
-
-    @JsonProperty List<Questions> questions;
-
-    public String getUrn() {
-        return urn;
+    public Control getControl() {
+        return control;
     }
 
-    public void setUrn(String urn) {
-        this.urn = urn;
+    public void setControl(Control control) {
+        this.control = control;
     }
 
-    public String getAuthRefNo() {
-        return authRefNo;
-    }
-
-    public void setAuthRefNo(String authRefNo) {
-        this.authRefNo = authRefNo;
-    }
-
-    public List<Questions> getQuestions() {
+    public Questions getQuestions() {
         return questions;
     }
 
-    public void setQuestions(List<Questions> questions) {
+    public void setQuestions(Questions questions) {
         this.questions = questions;
+    }
+
+    public Results getResults() {
+        return results;
+    }
+
+    public void setResults(Results results) {
+        this.results = results;
+    }
+
+    public Error getError() {
+        return error;
+    }
+
+    public void setError(Error error) {
+        this.error = error;
     }
 }

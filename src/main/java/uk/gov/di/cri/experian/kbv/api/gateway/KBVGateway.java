@@ -13,7 +13,6 @@ import java.util.Objects;
 
 public class KBVGateway {
 
-    private final HttpClient httpClient;
     private final SAARequestMapper saaRequestMapper;
     private final ResponseToQuestionMapper responseToQuestionMapper;
     private final KbvSoapWebServiceClient kbvSoapWebServiceClient;
@@ -35,8 +34,9 @@ public class KBVGateway {
 
         SAARequestDto apiRequest = saaRequestMapper.mapPersonIdentity(personIdentity);
 
-        IdentityIQWebServiceSoap soapEndpoint = getIdentityIQWebServiceSoapEndpoint(getToken());
-        SAAResponse2 saaResponse2 = getSaaResponse2(soapEndpoint, apiRequest);
+        IdentityIQWebServiceSoap identityIQWebServiceSoap =
+                kbvSoapWebServiceClient.getIdentityIQWebServiceSoapEndpoint();
+        SAAResponse2 saaResponse2 = getSaaResponse2(identityIQWebServiceSoap, apiRequest);
         System.out.println(saaResponse2);
         QuestionsResponse result =
                 saaRequestMapper.mapSAAResponse2ToQuestionsResponse(saaResponse2);
@@ -44,27 +44,8 @@ public class KBVGateway {
         return result;
     }
 
-    private IdentityIQWebServiceSoap getIdentityIQWebServiceSoapEndpoint(String token)
-            throws UnsupportedEncodingException {
-        IdentityIQWebService service = new IdentityIQWebService();
-        service.setHandlerResolver(new HeaderHandlerResolver(token));
-        IdentityIQWebServiceSoap soapEndpoint = service.getIdentityIQWebServiceSoap();
-        return soapEndpoint;
-    }
-
-    private String getToken() throws UnsupportedEncodingException {
-        TokenService tokenService = new TokenService();
-        TokenServiceSoap tokenServiceSoap = tokenService.getTokenServiceSoap();
-        String token = tokenServiceSoap.loginWithCertificate("GDS DI", true);
-        if (token == null || token.contains("Error")) {
-            throw new RuntimeException(token);
-        }
-        return Base64.getEncoder().encodeToString(token.getBytes(StandardCharsets.UTF_8));
-    }
-
     private SAAResponse2 getSaaResponse2(
-            IdentityIQWebServiceSoap soapEndpoint, SAARequestDto saaRequestDto)
-            throws UnsupportedEncodingException {
+            IdentityIQWebServiceSoap soapEndpoint, SAARequestDto saaRequestDto) {
         SAARequest saaRequest = createRequest(saaRequestDto);
         SAAResponse2 result = soapEndpoint.saa(saaRequest);
         return result;
