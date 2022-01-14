@@ -3,12 +3,15 @@ package uk.gov.di.cri.experian.kbv.api.gateway;
 import com.experian.uk.schema.experian.identityiq.services.webservice.IdentityIQWebServiceSoap;
 import com.experian.uk.schema.experian.identityiq.services.webservice.RTQRequest;
 import com.experian.uk.schema.experian.identityiq.services.webservice.RTQResponse2;
+import com.experian.uk.schema.experian.identityiq.services.webservice.SAARequest;
+import com.experian.uk.schema.experian.identityiq.services.webservice.SAAResponse2;
 import uk.gov.di.cri.experian.kbv.api.domain.PersonIdentity;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
-import uk.gov.di.cri.experian.kbv.api.domain.QuestionResponse;
+import uk.gov.di.cri.experian.kbv.api.domain.QuestionsResponse;
 import uk.gov.di.cri.experian.kbv.api.security.KbvSoapWebServiceClient;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class KBVGateway {
