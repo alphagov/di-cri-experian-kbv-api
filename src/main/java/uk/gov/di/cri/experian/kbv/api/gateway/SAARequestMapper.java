@@ -92,9 +92,7 @@ public class SAARequestMapper {
 
         if (personIdentity.getAddresses() != null && personIdentity.getAddresses().size() > 0) {
             ukLocation.setPostcode(personIdentity.getAddresses().get(0).getPostcode());
-            ukLocation.setDistrict(personIdentity.getAddresses().get(0).getTownCity());
-            ukLocation.setFlat(personIdentity.getAddresses().get(0).getHouseNameNumber());
-            ukLocation.setPostTown(personIdentity.getAddresses().get(0).getPostcode());
+            ukLocation.setPostTown(personIdentity.getAddresses().get(0).getTownCity());
             ukLocation.setStreet(personIdentity.getAddresses().get(0).getStreet());
             ukLocation.setHouseNumber(personIdentity.getAddresses().get(0).getHouseNameNumber());
         }
