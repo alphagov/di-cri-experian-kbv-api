@@ -25,7 +25,7 @@ public class KBVService {
             return null;
         }
     }
-    
+
     public QuestionAnswerResponse submitAnswers(QuestionAnswerRequest answers) {
         try {
             return kbvGateway.submitAnswers(answers);
