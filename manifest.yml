@@ -1,0 +1,13 @@
+---
+applications:
+  - name: di-cri-experian-kbv-api
+    routes:
+      - route: di-cri-experian-kbv-api.apps.internal
+    path: build/distributions/di-cri-experian-kbv-api.zip
+    memory: 256M
+    buildpack: java_buildpack
+    command: cd di-cri-experian-kbv-api && bin/di-cri-experian-kbv-api
+    env:
+      JAVA_HOME: "../.java-buildpack/open_jdk_jre"
+      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 11.+}, memory_calculator: {stack_threads: 200}}'
+      JAVA_OPTS: '-Xss200k -XX:ReservedCodeCacheSize=50M -XX:MaxMetaspaceSize=100M'
