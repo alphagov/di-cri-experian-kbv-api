@@ -1,6 +1,16 @@
 package uk.gov.di.cri.experian.kbv.api.gateway;
 
-import com.experian.uk.schema.experian.identityiq.services.webservice.*;
+import com.experian.uk.schema.experian.identityiq.services.webservice.Applicant;
+import com.experian.uk.schema.experian.identityiq.services.webservice.ApplicantDateOfBirth;
+import com.experian.uk.schema.experian.identityiq.services.webservice.ApplicantName;
+import com.experian.uk.schema.experian.identityiq.services.webservice.ApplicationData;
+import com.experian.uk.schema.experian.identityiq.services.webservice.Control;
+import com.experian.uk.schema.experian.identityiq.services.webservice.LocationDetails;
+import com.experian.uk.schema.experian.identityiq.services.webservice.LocationDetailsUKLocation;
+import com.experian.uk.schema.experian.identityiq.services.webservice.Parameters;
+import com.experian.uk.schema.experian.identityiq.services.webservice.Residency;
+import com.experian.uk.schema.experian.identityiq.services.webservice.SAARequest;
+import com.experian.uk.schema.experian.identityiq.services.webservice.SAAResponse2;
 import spark.utils.StringUtils;
 import uk.gov.di.cri.experian.kbv.api.domain.PersonIdentity;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionsResponse;
@@ -91,14 +101,26 @@ public class SAARequestMapper {
         LocationDetailsUKLocation ukLocation = new LocationDetailsUKLocation();
 
         if (personIdentity.getAddresses() != null && personIdentity.getAddresses().size() > 0) {
-            ukLocation.setPostcode(personIdentity.getAddresses().get(0).getPostcode());
-            ukLocation.setDistrict(personIdentity.getAddresses().get(0).getTownCity());
-            ukLocation.setFlat(personIdentity.getAddresses().get(0).getHouseNameNumber());
-            ukLocation.setPostTown(personIdentity.getAddresses().get(0).getPostcode());
-            ukLocation.setStreet(personIdentity.getAddresses().get(0).getStreet());
-            ukLocation.setHouseNumber(personIdentity.getAddresses().get(0).getHouseNameNumber());
+            if (StringUtils.isNotBlank(personIdentity.getAddresses().get(0).getHouseName())) {
+                ukLocation.setHouseName(personIdentity.getAddresses().get(0).getHouseName());
+            }
+
+            if (StringUtils.isNotBlank(personIdentity.getAddresses().get(0).getHouseNumber())) {
+                ukLocation.setHouseNumber(personIdentity.getAddresses().get(0).getHouseNumber());
+            }
+
+            if (StringUtils.isNotBlank(personIdentity.getAddresses().get(0).getFlat())) {
+                ukLocation.setFlat(personIdentity.getAddresses().get(0).getFlat());
+            }
+
+            if (StringUtils.isNotBlank(personIdentity.getAddresses().get(0).getDistrict())) {
+                ukLocation.setDistrict(personIdentity.getAddresses().get(0).getDistrict());
+            }
         }
 
+        ukLocation.setPostcode(personIdentity.getAddresses().get(0).getPostcode());
+        ukLocation.setPostTown(personIdentity.getAddresses().get(0).getTownCity());
+        ukLocation.setStreet(personIdentity.getAddresses().get(0).getStreet());
         locationDetails.setUKLocation(ukLocation);
         //        locationDetails.setClientLocationID("1");
         saaRequest.getLocationDetails().add(locationDetails);

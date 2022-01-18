@@ -6,7 +6,12 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public class PersonAddress {
-    private String houseNameNumber;
+
+    private String houseNumber;
+
+    private String houseName;
+
+    private String flat;
 
     @NotBlank(message = "{personAddress.street.required}")
     private String street;
@@ -17,17 +22,35 @@ public class PersonAddress {
     @NotBlank(message = "{personAddress.postcode.required}")
     private String postcode;
 
+    private String district;
+
     @NotNull(message = "{personAddress.addressType.required}")
     private AddressType addressType;
 
     private LocalDate dateMovedOut;
 
-    public String getHouseNameNumber() {
-        return houseNameNumber;
+    public String getHouseNumber() {
+        return houseNumber;
     }
 
-    public void setHouseNameNumber(String houseNameNumber) {
-        this.houseNameNumber = houseNameNumber;
+    public void setHouseNumber(String houseNumber) {
+        this.houseNumber = houseNumber;
+    }
+
+    public String getHouseName() {
+        return houseName;
+    }
+
+    public void setHouseName(String houseName) {
+        this.houseName = houseName;
+    }
+
+    public String getFlat() {
+        return flat;
+    }
+
+    public void setFlat(String flat) {
+        this.flat = flat;
     }
 
     public String getStreet() {
@@ -52,6 +75,14 @@ public class PersonAddress {
 
     public void setPostcode(String postcode) {
         this.postcode = postcode;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
     }
 
     public AddressType getAddressType() {
