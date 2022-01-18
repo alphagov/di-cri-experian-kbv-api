@@ -94,4 +94,4 @@ sonarqube {
 	}
 }
 
-mainClassName = "uk.gov.di.ipv.cri.experian.App"
+mainClassName = "uk.gov.di.cri.experian.kbv.api.App"
