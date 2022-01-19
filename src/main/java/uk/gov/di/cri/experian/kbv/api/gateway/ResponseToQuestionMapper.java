@@ -7,7 +7,7 @@ import com.experian.uk.schema.experian.identityiq.services.webservice.Response;
 import com.experian.uk.schema.experian.identityiq.services.webservice.Responses;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswer;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
-import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
+import uk.gov.di.cri.experian.kbv.api.domain.QuestionsResponse;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,8 +27,8 @@ public class ResponseToQuestionMapper {
         return rtqRequest;
     }
 
-    public QuestionAnswerResponse mapResultsToMapQuestionAnswersResponse(RTQResponse2 results) {
-        QuestionAnswerResponse questionAnswerResponse = new QuestionAnswerResponse();
+    public QuestionsResponse mapRTQResponse2ToMapQuestionsResponse(RTQResponse2 results) {
+        QuestionsResponse questionAnswerResponse = new QuestionsResponse();
 
         questionAnswerResponse.setQuestions(results.getQuestions());
         questionAnswerResponse.setResults(results.getResults());

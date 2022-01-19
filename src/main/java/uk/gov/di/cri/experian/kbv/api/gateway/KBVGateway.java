@@ -7,7 +7,6 @@ import com.experian.uk.schema.experian.identityiq.services.webservice.SAARequest
 import com.experian.uk.schema.experian.identityiq.services.webservice.SAAResponse2;
 import uk.gov.di.cri.experian.kbv.api.domain.PersonIdentity;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
-import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionsResponse;
 import uk.gov.di.cri.experian.kbv.api.security.KbvSoapWebServiceClient;
 
@@ -41,7 +40,7 @@ public class KBVGateway {
         return saaRequestMapper.mapSAAResponse2ToQuestionsResponse(saaResponse2);
     }
 
-    public QuestionAnswerResponse submitAnswers(QuestionAnswerRequest questionAnswerRequest)
+    public QuestionsResponse submitAnswers(QuestionAnswerRequest questionAnswerRequest)
             throws InterruptedException {
         RTQRequest rtqRequest =
                 this.responseToQuestionMapper.mapQuestionAnswersRtqRequest(questionAnswerRequest);
@@ -49,6 +48,6 @@ public class KBVGateway {
         IdentityIQWebServiceSoap identityIQWebServiceSoap =
                 kbvSoapWebServiceClient.getIdentityIQWebServiceSoapEndpoint();
         RTQResponse2 rtqResponse2 = identityIQWebServiceSoap.rtq(rtqRequest);
-        return this.responseToQuestionMapper.mapResultsToMapQuestionAnswersResponse(rtqResponse2);
+        return this.responseToQuestionMapper.mapRTQResponse2ToMapQuestionsResponse(rtqResponse2);
     }
 }

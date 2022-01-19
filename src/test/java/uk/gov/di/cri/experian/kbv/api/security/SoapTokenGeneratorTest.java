@@ -13,23 +13,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 class SoapTokenGeneratorTest {
 
-    private SoapTokenGenerator soapTokenGenerator;
+    private Base64TokenEncoder base64TokenEncoder;
 
     @Test
     void shouldReturnAGeneratedBase64EncodedTokenWhenGivenASoapTokenService() {
-        soapTokenGenerator = new SoapTokenGenerator("token");
+        base64TokenEncoder = new Base64TokenEncoder("token");
 
         assertEquals(
                 Base64.getEncoder().encodeToString("token".getBytes(StandardCharsets.UTF_8)),
-                soapTokenGenerator.getToken());
+                base64TokenEncoder.getToken());
     }
 
     @Test
     void shouldThrowAnExceptionWhenGivenSoapTokenServiceIsNotValid() {
-        soapTokenGenerator = new SoapTokenGenerator(null);
+        base64TokenEncoder = new Base64TokenEncoder(null);
 
         NullPointerException soapTokenNullRefException =
-                assertThrows(NullPointerException.class, () -> soapTokenGenerator.getToken());
+                assertThrows(NullPointerException.class, () -> base64TokenEncoder.getToken());
 
         assertEquals("The input must not be null", soapTokenNullRefException.getMessage());
         ;
@@ -37,8 +37,8 @@ class SoapTokenGeneratorTest {
 
     @Test
     void shouldThrowAnRuntimeExceptionWhenGivenSoapTokenServiceIsNotValid() {
-        soapTokenGenerator = new SoapTokenGenerator("Error");
+        base64TokenEncoder = new Base64TokenEncoder("Error");
 
-        assertThrows(RuntimeException.class, () -> soapTokenGenerator.getToken());
+        assertThrows(RuntimeException.class, () -> base64TokenEncoder.getToken());
     }
 }

@@ -4,10 +4,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
 
-public class SoapTokenGenerator {
+public class Base64TokenEncoder {
     private final String token;
 
-    public SoapTokenGenerator(String token) {
+    public Base64TokenEncoder(String token) {
         this.token = token;
     }
 
