@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
-import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
+import uk.gov.di.cri.experian.kbv.api.domain.QuestionsResponse;
 import uk.gov.di.cri.experian.kbv.api.domain.ValidationResult;
 import uk.gov.di.cri.experian.kbv.api.service.KBVService;
 import uk.gov.di.cri.experian.kbv.api.validation.InputValidationExecutor;
@@ -41,7 +41,7 @@ class QuestionAnswerResourceTest {
     @Test
     void returns200OkWhenSubmitQuestionAnswerHasValidInput() throws Exception {
         final String theRequestBody = "request-body";
-        final QuestionAnswerResponse submitAnswerResponseBody = mock(QuestionAnswerResponse.class);
+        final QuestionsResponse submitAnswerResponseBody = mock(QuestionsResponse.class);
 
         spark.Request mockRequest = mock(spark.Request.class);
         spark.Response mockResponse = mock(spark.Response.class);

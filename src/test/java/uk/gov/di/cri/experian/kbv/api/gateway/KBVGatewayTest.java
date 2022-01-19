@@ -7,7 +7,7 @@ import com.experian.uk.schema.experian.identityiq.services.webservice.Results;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
-import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
+import uk.gov.di.cri.experian.kbv.api.domain.QuestionsResponse;
 import uk.gov.di.cri.experian.kbv.api.security.KbvSoapWebServiceClient;
 import uk.gov.di.cri.experian.kbv.api.util.TestDataCreator;
 
@@ -76,7 +76,7 @@ class KBVGatewayTest {
         when(mockIdentityIQWebServiceSoap.rtq(mockRtqRequest)).thenReturn(mockRtqResponse);
         when(mockRtqResponse.getResults()).thenReturn(mockResults);
 
-        QuestionAnswerResponse questionAnswerRequestResult =
+        QuestionsResponse questionAnswerRequestResult =
                 kbvGateway.submitAnswers(questionAnswerRequest);
 
         // assertEquals(TEST_API_RESPONSE_BODY, questionAnswerRequestResult);

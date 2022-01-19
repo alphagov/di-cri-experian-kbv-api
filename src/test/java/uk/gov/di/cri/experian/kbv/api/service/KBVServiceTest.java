@@ -3,7 +3,7 @@ package uk.gov.di.cri.experian.kbv.api.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
-import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerResponse;
+import uk.gov.di.cri.experian.kbv.api.domain.QuestionsResponse;
 import uk.gov.di.cri.experian.kbv.api.gateway.KBVGateway;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,12 +23,12 @@ class KBVServiceTest {
 
     @Test
     void shouldReturnAResultWhenKbvServiceIsInvokedSuccessfully() throws InterruptedException {
-        QuestionAnswerResponse answerResponseResult = mock(QuestionAnswerResponse.class);
+        QuestionsResponse answerResponseResult = mock(QuestionsResponse.class);
         QuestionAnswerRequest mockQuestionAnswerRequest = mock(QuestionAnswerRequest.class);
         when(mockKbvGateway.submitAnswers(mockQuestionAnswerRequest))
                 .thenReturn(answerResponseResult);
 
-        QuestionAnswerResponse result = kbvService.submitAnswers(mockQuestionAnswerRequest);
+        QuestionsResponse result = kbvService.submitAnswers(mockQuestionAnswerRequest);
         verify(mockKbvGateway).submitAnswers(mockQuestionAnswerRequest);
         assertEquals(answerResponseResult, result);
     }
@@ -40,7 +40,7 @@ class KBVServiceTest {
         when(mockKbvGateway.submitAnswers(mockQuestionAnswerRequest))
                 .thenThrow(new InterruptedException());
 
-        QuestionAnswerResponse result = kbvService.submitAnswers(mockQuestionAnswerRequest);
+        QuestionsResponse result = kbvService.submitAnswers(mockQuestionAnswerRequest);
 
         assertNull(result);
     }
