@@ -17,6 +17,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import java.util.Optional;
+
 public class ExperianApi {
     private final HealthCheckResource healthCheckResource;
     private final QuestionResource questionResource;
@@ -24,7 +26,7 @@ public class ExperianApi {
 
     public ExperianApi() {
         try {
-            Spark.port(8080);
+            Spark.port(Integer.valueOf(Optional.ofNullable(System.getenv("PORT")).orElse("8080")));
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
 
