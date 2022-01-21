@@ -24,6 +24,7 @@ dependencies {
 	implementation 'org.slf4j:slf4j-api:1.7.32'
 	implementation 'org.slf4j:slf4j-simple:1.7.32'
 	implementation 'com.sun.xml.messaging.saaj:saaj-impl:1.5.3'
+	implementation 'com.github.ben-manes.caffeine:caffeine:3.0.5'
 	implementation "com.sparkjava:spark-core:2.9.3",
 			"com.fasterxml.jackson.core:jackson-databind:2.13.0",
 			"com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0",
@@ -32,6 +33,7 @@ dependencies {
 			"javax.validation:validation-api:2.0.1.Final",
 			"javax.el:javax.el-api:3.0.0",
 			"org.glassfish:javax.el:3.0.0"
+	implementation 'junit:junit:4.13.1'
 
 	testImplementation "org.junit.jupiter:junit-jupiter:5.8.2",
 			"org.mockito:mockito-junit-jupiter:4.1.0",

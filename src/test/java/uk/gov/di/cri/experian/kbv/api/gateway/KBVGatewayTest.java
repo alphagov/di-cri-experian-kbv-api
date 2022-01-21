@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionAnswerRequest;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionsResponse;
-import uk.gov.di.cri.experian.kbv.api.security.KbvSoapWebServiceClient;
 import uk.gov.di.cri.experian.kbv.api.util.TestDataCreator;
 
 import java.util.Map;
@@ -21,16 +20,16 @@ import static org.mockito.Mockito.when;
 class KBVGatewayTest {
 
     private class KbvGatewayContructorArgs {
-        private final KbvSoapWebServiceClient kbvSoapWebServiceClient;
+        private final IdentityIQWebServiceSoap identityIQWebServiceSoap;
         private final ResponseToQuestionMapper responseToQuestionMapper;
         private final SAARequestMapper saaRequestMapper;
 
         public KbvGatewayContructorArgs(
                 SAARequestMapper saaRequestMapper,
                 ResponseToQuestionMapper responseToQuestionMapper,
-                KbvSoapWebServiceClient kbvSoapWebServiceClient) {
+                IdentityIQWebServiceSoap identityIQWebServiceSoap) {
 
-            this.kbvSoapWebServiceClient = kbvSoapWebServiceClient;
+            this.identityIQWebServiceSoap = identityIQWebServiceSoap;
             this.saaRequestMapper = saaRequestMapper;
             this.responseToQuestionMapper = responseToQuestionMapper;
         }
@@ -41,8 +40,8 @@ class KBVGatewayTest {
     private SAARequestMapper mockSAARequestMapper = mock(SAARequestMapper.class);
     private ResponseToQuestionMapper mockResponseToQuestionMapper =
             mock(ResponseToQuestionMapper.class);
-    private KbvSoapWebServiceClient mockKbvSoapWebServiceClient =
-            mock(KbvSoapWebServiceClient.class);
+    private IdentityIQWebServiceSoap mockIdentityIQWebServiceSoap =
+            mock(IdentityIQWebServiceSoap.class);
 
     @BeforeEach
     void setUp() {
@@ -50,7 +49,7 @@ class KBVGatewayTest {
                 new KBVGateway(
                         mockSAARequestMapper,
                         mockResponseToQuestionMapper,
-                        mockKbvSoapWebServiceClient);
+                        mockIdentityIQWebServiceSoap);
     }
 
     @Test
@@ -62,8 +61,8 @@ class KBVGatewayTest {
         // when(this.mockObjectMapper.writeValueAsString(testApiRequest)).thenReturn(testRequestBody);
         // ArgumentCaptor<HttpRequest> httpRequestCaptor =
         // ArgumentCaptor.forClass(HttpRequest.class);
-        IdentityIQWebServiceSoap mockIdentityIQWebServiceSoap =
-                mock(IdentityIQWebServiceSoap.class);
+        com.experian.uk.schema.experian.identityiq.services.webservice.IdentityIQWebServiceSoap mockIdentityIQWebServiceSoap =
+                mock(com.experian.uk.schema.experian.identityiq.services.webservice.IdentityIQWebServiceSoap.class);
 
         RTQResponse2 mockRtqResponse = mock(RTQResponse2.class);
         RTQRequest mockRtqRequest = mock(RTQRequest.class);
@@ -71,8 +70,7 @@ class KBVGatewayTest {
 
         when(mockResponseToQuestionMapper.mapQuestionAnswersRtqRequest(questionAnswerRequest))
                 .thenReturn(mockRtqRequest);
-        when(mockKbvSoapWebServiceClient.getIdentityIQWebServiceSoapEndpoint())
-                .thenReturn(mockIdentityIQWebServiceSoap);
+
         when(mockIdentityIQWebServiceSoap.rtq(mockRtqRequest)).thenReturn(mockRtqResponse);
         when(mockRtqResponse.getResults()).thenReturn(mockResults);
 
@@ -83,7 +81,6 @@ class KBVGatewayTest {
         verify(mockResponseToQuestionMapper).mapQuestionAnswersRtqRequest(questionAnswerRequest);
         // verify(mockObjectMapper).writeValueAsString(mockRtqRequest);
         // verify(mockKbvApiConfig).getEndpointUri();
-        verify(mockKbvSoapWebServiceClient).getIdentityIQWebServiceSoapEndpoint();
         // assertEquals(testEndpointUri, httpRequestCaptor.getValue().uri().toString());
         // assertEquals("POST", httpRequestCaptor.getValue().method());
         // HttpHeaders capturedHttpRequestHeaders = httpRequestCaptor.getValue().headers();
@@ -100,17 +97,17 @@ class KBVGatewayTest {
                         new KbvGatewayContructorArgs(null, null, null),
                         "rtqRequestMapper must not be null",
                         new KBVGatewayTest.KbvGatewayContructorArgs(
-                                null, null, mock(KbvSoapWebServiceClient.class)),
+                                null, null, mock(IdentityIQWebServiceSoap.class)),
                         "objectMapper must not be null",
                         new KBVGatewayTest.KbvGatewayContructorArgs(
                                 null,
                                 mock(ResponseToQuestionMapper.class),
-                                mock(KbvSoapWebServiceClient.class)),
+                                mock(IdentityIQWebServiceSoap.class)),
                         "kbvApiConfig must not be null",
                         new KBVGatewayTest.KbvGatewayContructorArgs(
                                 null,
                                 mock(ResponseToQuestionMapper.class),
-                                mock(KbvSoapWebServiceClient.class)));
+                                mock(IdentityIQWebServiceSoap.class)));
 
         testCases.forEach(
                 (errorMessage, constructorArgs) -> {
@@ -120,7 +117,7 @@ class KBVGatewayTest {
                                 new KBVGateway(
                                         constructorArgs.saaRequestMapper,
                                         constructorArgs.responseToQuestionMapper,
-                                        constructorArgs.kbvSoapWebServiceClient);
+                                        constructorArgs.identityIQWebServiceSoap);
                             },
                             errorMessage);
                 });

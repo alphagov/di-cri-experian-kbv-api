@@ -5,19 +5,26 @@ import java.util.Base64;
 import java.util.Objects;
 
 public class Base64TokenEncoder {
-    private final String token;
+    private final String key;
+    private String token;
 
-    public Base64TokenEncoder(String token) {
-        this.token = token;
+    public Base64TokenEncoder(String key, SoapToken soapToken) {
+        this.key = key;
+        this.token = soapToken.getToken();
     }
 
     public String getToken() {
-        Objects.requireNonNull(token, "The input must not be null");
+        Objects.requireNonNull(token, "The token must not be null");
 
         if (token.contains("Error")) {
             throw new RuntimeException();
         }
 
         return Base64.getEncoder().encodeToString(token.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public String toString() {
+        return "Key: " + key;
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.di.cri.experian.kbv.api;
 
+import com.experian.uk.schema.experian.identityiq.services.webservice.IdentityIQWebService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import spark.Spark;
@@ -9,6 +10,9 @@ import uk.gov.di.cri.experian.kbv.api.gateway.SAARequestMapper;
 import uk.gov.di.cri.experian.kbv.api.resource.HealthCheckResource;
 import uk.gov.di.cri.experian.kbv.api.resource.QuestionAnswerResource;
 import uk.gov.di.cri.experian.kbv.api.resource.QuestionResource;
+import uk.gov.di.cri.experian.kbv.api.security.Base64TokenCacheLoader;
+import uk.gov.di.cri.experian.kbv.api.security.HeaderHandler;
+import uk.gov.di.cri.experian.kbv.api.security.HeaderHandlerResolver;
 import uk.gov.di.cri.experian.kbv.api.security.KBVClientFactory;
 import uk.gov.di.cri.experian.kbv.api.service.KBVService;
 import uk.gov.di.cri.experian.kbv.api.validation.InputValidationExecutor;
@@ -55,10 +59,14 @@ public class ExperianApi {
     }
 
     private KBVService createKbvService() {
+        var headerHandler = new HeaderHandler(new Base64TokenCacheLoader());
         return new KBVService(
                 new KBVGateway(
                         new SAARequestMapper(),
                         new ResponseToQuestionMapper(),
-                        KBVClientFactory.createClient("GDS DI", true)));
+                        new KBVClientFactory(
+                                        new IdentityIQWebService(),
+                                        new HeaderHandlerResolver(headerHandler))
+                                .createClient()));
     }
 }

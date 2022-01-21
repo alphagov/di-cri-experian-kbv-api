@@ -1,5 +1,8 @@
 package uk.gov.di.cri.experian.kbv.api.security;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+
 import javax.xml.namespace.QName;
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPElement;
@@ -12,15 +15,14 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
-import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
+    private final LoadingCache<String, Base64TokenEncoder> cache;
 
-    private final String token;
-
-    public HeaderHandler(String token) {
-        this.token = Objects.requireNonNull(token);
+    public HeaderHandler(Base64TokenCacheLoader tokenEncoder) {
+        this.cache = Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.HOURS).build(tokenEncoder);
     }
 
     public boolean handleMessage(SOAPMessageContext smc) {
@@ -55,8 +57,8 @@ public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
                         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
                 binarySecurityToken.addAttribute(new QName("EncodingType"), "wsse:Base64Binary");
                 binarySecurityToken.addAttribute(new QName("ValueType"), "ExperianWASP");
-                binarySecurityToken.setValue(token);
-
+                Base64TokenEncoder tokenEncoder = cache.get("experian-soap-token");
+                binarySecurityToken.setValue(tokenEncoder.getToken());
                 soapMessage.saveChanges();
 
             } catch (SOAPException e) {
