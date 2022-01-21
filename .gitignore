@@ -41,3 +41,5 @@ kbv-api/src/main/resources/data
 
 .env
 .http
+
+.aws-sam/

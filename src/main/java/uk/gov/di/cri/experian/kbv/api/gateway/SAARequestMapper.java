@@ -11,9 +11,9 @@ import com.experian.uk.schema.experian.identityiq.services.webservice.Parameters
 import com.experian.uk.schema.experian.identityiq.services.webservice.Residency;
 import com.experian.uk.schema.experian.identityiq.services.webservice.SAARequest;
 import com.experian.uk.schema.experian.identityiq.services.webservice.SAAResponse2;
-import spark.utils.StringUtils;
 import uk.gov.di.cri.experian.kbv.api.domain.PersonIdentity;
 import uk.gov.di.cri.experian.kbv.api.domain.QuestionsResponse;
+import uk.gov.di.cri.experian.kbv.api.util.StringUtils;
 
 import java.util.UUID;
 

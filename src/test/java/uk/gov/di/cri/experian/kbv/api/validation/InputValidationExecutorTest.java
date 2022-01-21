@@ -47,10 +47,12 @@ public class InputValidationExecutorTest {
     void shouldReturnInvalidValidationResultWhenInvalidInputProvided() {
         final String validationErrorMsg = "validation error message";
         final PersonIdentity personIdentity = TestDataCreator.createTestPersonIdentity();
-        ConstraintViolation<PersonIdentity> mockConstraintViolation =
-                (ConstraintViolation<PersonIdentity>) Mockito.mock(ConstraintViolation.class);
+
+        ConstraintViolation<?> mockConstraintViolation = Mockito.mock(ConstraintViolation.class);
         when(mockConstraintViolation.getMessage()).thenReturn(validationErrorMsg);
-        when(mockValidator.validate(personIdentity)).thenReturn(Set.of(mockConstraintViolation));
+        Mockito.doReturn(Set.of(mockConstraintViolation))
+                .when(mockValidator)
+                .validate(personIdentity);
 
         ValidationResult validationResult =
                 inputValidationExecutor.performInputValidation(personIdentity);

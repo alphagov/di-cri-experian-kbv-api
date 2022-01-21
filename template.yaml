@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  di-ipv-cri-experian-kbv-api
+  SAM Template for the experian kbv api
+
+Globals:
+  Api:
+    Auth:
+      DefaultAuthorizer: AWS_IAM
+  Function:
+    Timeout: 60
+    VpcConfig:
+      SecurityGroupIds:
+        - sg-TBD
+      SubnetIds:
+        - subnet-TBD
+
+Resources:
+  KbvQuestionRetrievalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: uk.gov.di.cri.experian.kbv.api.handler.QuestionHandler::handleRequest
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - Statement:
+          - Sid: ReadSecretsPolicy
+            Effect: Allow
+            Action:
+              - 'secretsmanager:GetSecretValue'
+            Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/dev/di-ipv-cri-experian-kbv-api*'
+      Runtime: java11
+      MemorySize: 512
+      Tracing: Active
+      Environment:
+        Variables:
+          POWERTOOLS_SERVICE_NAME: di-ipv-cri-experian-kbv-api-question
+
+      Events:
+        RetrieveQuestions:
+          Type: Api
+          Properties:
+            Path: /question-request
+            Method: post
+  KbvQuestionAnswerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: uk.gov.di.cri.experian.kbv.api.handler.QuestionAnswerHandler::handleRequest
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSXrayWriteOnlyAccess
+        - Statement:
+            - Sid: ReadSecretsPolicy
+              Effect: Allow
+              Action:
+                - 'secretsmanager:GetSecretValue'
+              Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/dev/di-ipv-cri-experian-kbv-api*'
+      Runtime: java11
+      MemorySize: 512
+      Tracing: Active
+      Environment:
+        Variables:
+          POWERTOOLS_SERVICE_NAME: di-ipv-cri-experian-kbv-api-question-answer
+
+      Events:
+        RetrieveQuestions:
+          Type: Api
+          Properties:
+            Path: /question-answer
+            Method: post
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  KbvQuestionRetrievalApi:
+    Description: "API Gateway endpoint URL for Prod stage for question retrieval function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/question-request/"
+  KbvQuestionRetrievalFunction:
+    Description: "Question retrieval lambda function ARN"
+    Value: !GetAtt KbvQuestionRetrievalFunction.Arn
+  KbvQuestionRetrievalFunctionIamRole:
+    Description: "Implicit IAM Role created for question retrieval function"
+    Value: !GetAtt KbvQuestionRetrievalFunction.Arn
+  KbvQuestionAnswerApi:
+    Description: "API Gateway endpoint URL for Prod stage for question answer function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/question-answer/"
+  KbvQuestionAnswerFunction:
+    Description: "Question answer lambda function ARN"
+    Value: !GetAtt KbvQuestionAnswerFunction.Arn
+  KbvQuestionAnswerFunctionIamRole:
+    Description: "Implicit IAM Role created for question answer function"
+    Value: !GetAtt KbvQuestionAnswerFunction.Arn
