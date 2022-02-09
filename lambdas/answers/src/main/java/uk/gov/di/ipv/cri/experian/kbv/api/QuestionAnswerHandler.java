@@ -1,4 +1,4 @@
-package uk.gov.di.ipv.cri.experian.kbv.api.handler;
+package uk.gov.di.ipv.cri.experian.kbv.api;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -28,7 +28,6 @@ import uk.gov.di.ipv.cri.experian.kbv.api.validation.InputValidationExecutor;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

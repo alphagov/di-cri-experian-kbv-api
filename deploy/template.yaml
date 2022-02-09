@@ -12,9 +12,9 @@ Globals:
     Timeout: 60
     VpcConfig:
       SecurityGroupIds:
-        - sg-TBD
+        - sg-03a1efaf2fed58442
       SubnetIds:
-        - subnet-TBD
+        - subnet-07fcf55b165be35ed
 
 Parameters:
   Environment:
@@ -32,8 +32,8 @@ Resources:
   KbvQuestionRetrievalFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./
-      Handler: uk.gov.di.ipv.cri.experian.kbv.api.handler.QuestionHandler::handleRequest
+      CodeUri: ../lambdas/questions
+      Handler: uk.gov.di.ipv.cri.experian.kbv.api.QuestionHandler::handleRequest
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSXrayWriteOnlyAccess
@@ -59,8 +59,8 @@ Resources:
   KbvQuestionAnswerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ./
-      Handler: uk.gov.di.ipv.cri.experian.kbv.api.handler.QuestionAnswerHandler::handleRequest
+      CodeUri: ../lambdas/answers
+      Handler: uk.gov.di.ipv.cri.experian.kbv.api.QuestionAnswerHandler::handleRequest
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSXrayWriteOnlyAccess
