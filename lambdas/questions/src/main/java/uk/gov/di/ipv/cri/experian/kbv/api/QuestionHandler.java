@@ -1,4 +1,4 @@
-package uk.gov.di.ipv.cri.experian.kbv.api.handler;
+package uk.gov.di.ipv.cri.experian.kbv.api;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;

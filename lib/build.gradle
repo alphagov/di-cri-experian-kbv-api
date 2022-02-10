@@ -1,0 +1,89 @@
+plugins {
+	id "java-library"
+	id 'idea'
+	id "jacoco"
+	id "io.swagger.core.v3.swagger-gradle-plugin" version "2.1.11"
+	id "io.freefair.aspectj.post-compile-weaving" version "6.3.0"
+	id 'com.github.bjornvester.wsdl2java' version '1.2'
+}
+
+group "uk.gov.di.ipv.cri.experian.kbv.api"
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation "com.amazonaws:aws-lambda-java-core:1.2.1",
+			'com.github.ben-manes.caffeine:caffeine:3.0.5',
+			"com.amazonaws:aws-lambda-java-events:3.11.0",
+			'org.apache.cxf:cxf-rt-frontend-jaxws:3.4.5',
+			'org.apache.cxf:cxf-rt-transports-http:3.4.5',
+			'javax.annotation:javax.annotation-api:1.3.2',
+			'org.apache.logging.log4j:log4j-api:2.17.1',
+			'org.apache.logging.log4j:log4j-core:2.17.1',
+			'com.sun.xml.messaging.saaj:saaj-impl:1.5.3',
+			"com.fasterxml.jackson.core:jackson-databind:2.13.0",
+			"com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0",
+			"org.hibernate.validator:hibernate-validator:6.2.1.Final",
+			"org.hibernate:hibernate-validator-annotation-processor:6.2.1.Final",
+			"javax.validation:validation-api:2.0.1.Final",
+			"javax.el:javax.el-api:3.0.0",
+			"org.glassfish:javax.el:3.0.0"
+	aspect "software.amazon.lambda:powertools-tracing:1.10.2",
+			"software.amazon.lambda:powertools-parameters:1.10.2"
+	runtimeOnly 'org.apache.logging.log4j:log4j-slf4j18-impl:2.17.1',
+			'com.amazonaws:aws-lambda-java-log4j2:1.5.1'
+	testImplementation "org.junit.jupiter:junit-jupiter:5.8.2",
+			'org.mockito:mockito-junit-jupiter:4.3.1',
+			'org.mockito:mockito-inline:4.3.1',
+			project(":lib")
+}
+
+
+test {
+	useJUnitPlatform ()
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required.set(true)
+	}
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_11
+	targetCompatibility = JavaVersion.VERSION_11
+	withSourcesJar()
+}
+
+tasks.named("jar") {
+	manifest {
+		attributes(
+				"Implementation-Title": project.name,
+				"Implementation-Version": project.version
+				)
+	}
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = [
+				'src/build/generated/sources/wsdl2java',
+				'src/main/java'
+			]
+		}
+	}
+}
+
+wsdl2java {
+	includes = [
+		'wsdl/iiq-wasp-token.wsdl',
+		'wsdl/iiq-service.wsdl'
+	]
+}
+
+tasks.sourcesJar.dependsOn 'wsdl2java'

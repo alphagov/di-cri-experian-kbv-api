@@ -1,0 +1,5 @@
+rootProject.name = "di-ipv-experian-kbv-api"
+include "lib",
+		"lambdas",
+		"lambdas:questions",
+		"lambdas:answers"

@@ -29,7 +29,7 @@ public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
 
         Boolean outbound = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 
-        if (outbound.booleanValue()) {
+        if (outbound) {
 
             SOAPMessage soapMessage = smc.getMessage();
 
