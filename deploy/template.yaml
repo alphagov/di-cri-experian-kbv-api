@@ -5,9 +5,6 @@ Description: >
   SAM Template for the experian kbv api
 
 Globals:
-  Api:
-    Auth:
-      DefaultAuthorizer: AWS_IAM
   Function:
     Timeout: 60
     VpcConfig:
@@ -29,6 +26,13 @@ Parameters:
     ConstraintDescription: specify dev, staging, integration or prod for environment
 
 Resources:
+
+  KbvApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      OpenApiVersion: 3.0.1
+      StageName: !Ref Environment
+
   KbvQuestionRetrievalFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -56,6 +60,8 @@ Resources:
           Properties:
             Path: /question-request
             Method: post
+            RestApiId: !Ref KbvApi
+
   KbvQuestionAnswerFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -83,6 +89,7 @@ Resources:
           Properties:
             Path: /question-answer
             Method: post
+            RestApiId: !Ref KbvApi
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -90,7 +97,7 @@ Outputs:
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   KbvQuestionRetrievalApi:
     Description: "API Gateway endpoint URL for Prod stage for question retrieval function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question-request/"
+    Value: !Sub "https://${KbvApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question-request/"
   KbvQuestionRetrievalFunction:
     Description: "Question retrieval lambda function ARN"
     Value: !GetAtt KbvQuestionRetrievalFunction.Arn
@@ -99,7 +106,7 @@ Outputs:
     Value: !GetAtt KbvQuestionRetrievalFunction.Arn
   KbvQuestionAnswerApi:
     Description: "API Gateway endpoint URL for Prod stage for question answer function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question-answer/"
+    Value: !Sub "https://${KbvApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question-answer/"
   KbvQuestionAnswerFunction:
     Description: "Question answer lambda function ARN"
     Value: !GetAtt KbvQuestionAnswerFunction.Arn
