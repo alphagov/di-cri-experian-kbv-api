@@ -7,6 +7,9 @@ Description: >
 Globals:
   Function:
     Timeout: 60
+    Runtime: java11
+    MemorySize: 512
+    Tracing: Active
     VpcConfig:
       SecurityGroupIds:
         - sg-03a1efaf2fed58442
@@ -38,22 +41,18 @@ Resources:
     Properties:
       CodeUri: ../lambdas/questions
       Handler: uk.gov.di.ipv.cri.experian.kbv.api.QuestionHandler::handleRequest
+      Environment:
+        Variables:
+          POWERTOOLS_SERVICE_NAME: di-ipv-cri-experian-kbv-api-question
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSXrayWriteOnlyAccess
         - Statement:
-          - Sid: ReadSecretsPolicy
-            Effect: Allow
-            Action:
-              - 'secretsmanager:GetSecretValue'
-            Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/di-ipv-cri-experian-kbv-api*'
-      Runtime: java11
-      MemorySize: 512
-      Tracing: Active
-      Environment:
-        Variables:
-          POWERTOOLS_SERVICE_NAME: di-ipv-cri-experian-kbv-api-question
-
+            - Sid: ReadSecretsPolicy
+              Effect: Allow
+              Action:
+                - 'secretsmanager:GetSecretValue'
+              Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/di-ipv-cri-experian-kbv-api*'
       Events:
         RetrieveQuestions:
           Type: Api
@@ -67,6 +66,9 @@ Resources:
     Properties:
       CodeUri: ../lambdas/answers
       Handler: uk.gov.di.ipv.cri.experian.kbv.api.QuestionAnswerHandler::handleRequest
+      Environment:
+        Variables:
+          POWERTOOLS_SERVICE_NAME: di-ipv-cri-experian-kbv-api-question-answer
       Policies:
         - AWSLambdaBasicExecutionRole
         - AWSXrayWriteOnlyAccess
@@ -76,13 +78,6 @@ Resources:
               Action:
                 - 'secretsmanager:GetSecretValue'
               Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/di-ipv-cri-experian-kbv-api*'
-      Runtime: java11
-      MemorySize: 512
-      Tracing: Active
-      Environment:
-        Variables:
-          POWERTOOLS_SERVICE_NAME: di-ipv-cri-experian-kbv-api-question-answer
-
       Events:
         RetrieveQuestions:
           Type: Api
