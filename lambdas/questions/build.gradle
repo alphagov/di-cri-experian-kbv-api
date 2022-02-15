@@ -18,8 +18,6 @@ dependencies {
 			'org.apache.cxf:cxf-rt-frontend-jaxws:3.4.5',
 			'org.apache.cxf:cxf-rt-transports-http:3.4.5',
 			'javax.annotation:javax.annotation-api:1.3.2',
-			'org.apache.logging.log4j:log4j-api:2.17.1',
-			'org.apache.logging.log4j:log4j-core:2.17.1',
 			'com.sun.xml.messaging.saaj:saaj-impl:1.5.3',
 			"org.hibernate.validator:hibernate-validator:6.2.1.Final",
 			"org.hibernate:hibernate-validator-annotation-processor:6.2.1.Final",

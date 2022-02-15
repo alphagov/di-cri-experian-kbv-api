@@ -15,6 +15,7 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -70,7 +71,7 @@ public class HeaderHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     public Set getHeaders() {
-        return null;
+        return Collections.emptySet();
     }
 
     public boolean handleFault(SOAPMessageContext context) {

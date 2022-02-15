@@ -5,6 +5,7 @@ import uk.gov.di.ipv.cri.experian.kbv.api.domain.PersonAddress;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.PersonIdentity;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionAnswer;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionAnswerRequest;
+import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionRequest;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,5 +33,13 @@ public class TestDataCreator {
         answerRequest.setAuthRefNo("auth-ref-no");
         answerRequest.setQuestionAnswers(List.of(new QuestionAnswer(), new QuestionAnswer()));
         return answerRequest;
+    }
+
+    public static QuestionRequest createTestQuestionAnswerRequest(AddressType addressType) {
+        QuestionRequest questionRequest = new QuestionRequest();
+        questionRequest.setUrn("urn");
+        questionRequest.setStrategy("1 out of 2");
+        questionRequest.setPersonIdentity(createTestPersonIdentity(addressType));
+        return questionRequest;
     }
 }
