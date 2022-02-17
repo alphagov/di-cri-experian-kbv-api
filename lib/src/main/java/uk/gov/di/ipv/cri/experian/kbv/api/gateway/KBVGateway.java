@@ -5,11 +5,10 @@ import com.experian.uk.schema.experian.identityiq.services.webservice.RTQRequest
 import com.experian.uk.schema.experian.identityiq.services.webservice.RTQResponse2;
 import com.experian.uk.schema.experian.identityiq.services.webservice.SAARequest;
 import com.experian.uk.schema.experian.identityiq.services.webservice.SAAResponse2;
-import uk.gov.di.ipv.cri.experian.kbv.api.domain.PersonIdentity;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionAnswerRequest;
+import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionRequest;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionsResponse;
 
-import java.io.IOException;
 import java.util.Objects;
 
 public class KBVGateway {
@@ -30,9 +29,8 @@ public class KBVGateway {
         this.identityIQWebServiceSoap = identityIQWebServiceSoap;
     }
 
-    public QuestionsResponse getQuestions(PersonIdentity personIdentity)
-            throws IOException, InterruptedException {
-        SAARequest saaRequest = saaRequestMapper.mapPersonIdentity(personIdentity);
+    public QuestionsResponse getQuestions(QuestionRequest questionRequest) {
+        SAARequest saaRequest = saaRequestMapper.mapQuestionRequest(questionRequest);
         SAAResponse2 saaResponse2 = identityIQWebServiceSoap.saa(saaRequest);
         return saaRequestMapper.mapSAAResponse2ToQuestionsResponse(saaResponse2);
     }

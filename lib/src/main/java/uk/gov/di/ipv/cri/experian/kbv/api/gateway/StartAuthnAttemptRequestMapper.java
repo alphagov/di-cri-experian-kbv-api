@@ -12,23 +12,38 @@ import com.experian.uk.schema.experian.identityiq.services.webservice.Residency;
 import com.experian.uk.schema.experian.identityiq.services.webservice.SAARequest;
 import com.experian.uk.schema.experian.identityiq.services.webservice.SAAResponse2;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.PersonIdentity;
+import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionRequest;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionsResponse;
 import uk.gov.di.ipv.cri.experian.kbv.api.util.StringUtils;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class StartAuthnAttemptRequestMapper {
 
-    public SAARequest mapPersonIdentity(PersonIdentity personIdentity) {
-        return createRequest(personIdentity);
+    public static final String DEFAULT_STRATEGY = "3 out of 4";
+
+    public SAARequest mapQuestionRequest(QuestionRequest questionRequest) {
+        Objects.requireNonNull(questionRequest, "The QuestionRequest must not be null");
+
+        return createRequest(questionRequest);
     }
 
-    private SAARequest createRequest(PersonIdentity personIdentity) {
+    public QuestionsResponse mapSAAResponse2ToQuestionsResponse(SAAResponse2 sAAResponse2) {
+        QuestionsResponse questionsResponse = new QuestionsResponse();
+        questionsResponse.setQuestions(sAAResponse2.getQuestions());
+        questionsResponse.setControl(sAAResponse2.getControl());
+        questionsResponse.setError(sAAResponse2.getError());
+        questionsResponse.setResults(sAAResponse2.getResults());
+        return questionsResponse;
+    }
+
+    private SAARequest createRequest(QuestionRequest questionRequest) {
         SAARequest saaRequest = new SAARequest();
-        setApplicant(saaRequest, personIdentity);
-        setApplicationData(saaRequest);
-        setControl(saaRequest);
-        setLocationDetails(saaRequest, personIdentity);
+        setApplicant(saaRequest, questionRequest.getPersonIdentity());
+        setApplicationData(saaRequest, questionRequest.getStrategy());
+        setControl(saaRequest, questionRequest);
+        setLocationDetails(saaRequest, questionRequest.getPersonIdentity());
         setResidency(saaRequest);
         return saaRequest;
     }
@@ -40,27 +55,31 @@ public class StartAuthnAttemptRequestMapper {
         saaRequest.getResidency().add(residency);
     }
 
-    private void setApplicationData(SAARequest saaRequest) {
+    private void setApplicationData(SAARequest saaRequest, String strategy) {
         ApplicationData applicationData = new ApplicationData();
         applicationData.setApplicationType("IG");
         applicationData.setChannel("IN");
         applicationData.setSearchConsent("Y");
-        applicationData.setProduct("3 out of 4");
+        applicationData.setProduct(StringUtils.isNotBlank(strategy) ? strategy : DEFAULT_STRATEGY);
         saaRequest.setApplicationData(applicationData);
     }
 
-    private void setControl(SAARequest saaRequest) {
-        saaRequest.setControl(createControl());
+    private void setControl(SAARequest saaRequest, QuestionRequest questionRequest) {
+        saaRequest.setControl(createControl(questionRequest));
     }
 
-    private Control createControl() {
+    private Control createControl(QuestionRequest questionRequest) {
         Control control = new Control();
         control.setTestDatabase("A");
         Parameters parameters = new Parameters();
         parameters.setOneShotAuthentication("N");
         parameters.setStoreCaseData("P");
         control.setParameters(parameters);
-        control.setURN(UUID.randomUUID().toString());
+        control.setURN(
+                StringUtils.isNotBlank(questionRequest.getUrn())
+                        ? questionRequest.getUrn()
+                        : UUID.randomUUID().toString()
+        );
         control.setOperatorID("GDSCABINETUIIQ01U");
         return control;
     }
@@ -100,7 +119,7 @@ public class StartAuthnAttemptRequestMapper {
         locationDetails.setLocationIdentifier(1);
         LocationDetailsUKLocation ukLocation = new LocationDetailsUKLocation();
 
-        if (personIdentity.getAddresses() != null && personIdentity.getAddresses().size() > 0) {
+        if (personIdentity.getAddresses() != null && !personIdentity.getAddresses().isEmpty()) {
             if (StringUtils.isNotBlank(personIdentity.getAddresses().get(0).getHouseName())) {
                 ukLocation.setHouseName(personIdentity.getAddresses().get(0).getHouseName());
             }
@@ -125,13 +144,5 @@ public class StartAuthnAttemptRequestMapper {
         //        locationDetails.setClientLocationID("1");
         saaRequest.getLocationDetails().add(locationDetails);
     }
-
-    public QuestionsResponse mapSAAResponse2ToQuestionsResponse(SAAResponse2 sAAResponse2) {
-        QuestionsResponse questionsResponse = new QuestionsResponse();
-        questionsResponse.setQuestions(sAAResponse2.getQuestions());
-        questionsResponse.setControl(sAAResponse2.getControl());
-        questionsResponse.setError(sAAResponse2.getError());
-        questionsResponse.setResults(sAAResponse2.getResults());
-        return questionsResponse;
-    }
 }
+
