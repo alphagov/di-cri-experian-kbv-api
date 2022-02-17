@@ -1,20 +1,19 @@
 package uk.gov.di.ipv.cri.experian.kbv.api;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.amazonaws.xray.AWSXRay;
+import com.amazonaws.xray.AWSXRayRecorderBuilder;
+import com.amazonaws.xray.strategy.LogErrorContextMissingStrategy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.di.ipv.cri.experian.kbv.api.domain.PersonIdentity;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionRequest;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionsResponse;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.ValidationResult;
@@ -41,10 +40,9 @@ class QuestionHandlerTest {
 
     @BeforeEach
     void setUp() {
-        AWSXRay.beginSegment("handleRequest");
-
+        AWSXRay.setGlobalRecorder(AWSXRayRecorderBuilder.standard().withContextMissingStrategy(new LogErrorContextMissingStrategy()).build());
         when(kbvServiceFactoryMock.create()).thenReturn(kbvServiceMock);
-        when(keyStoreServiceMock.getValue()).thenReturn("keystore-value");
+        when(keyStoreServiceMock.getKeyStorePath()).thenReturn("keystore-value");
         when(keyStoreServiceMock.getPassword()).thenReturn("keystore-password");
         questionHandler = new QuestionHandler(
                 objectMapperMock,
@@ -52,11 +50,6 @@ class QuestionHandlerTest {
                 kbvServiceFactoryMock,
                 inputValidationExecutorMock
         );
-    }
-
-    @AfterEach
-    void tearDown() {
-        AWSXRay.endSegment();
     }
 
     @Test
@@ -100,9 +93,9 @@ class QuestionHandlerTest {
     }
 
     @Test
-    void shouldReturn500ErrorWhenGeneratedAtTheServer() {
+    void shouldReturn500ErrorWhenAServerErrorOccurs() {
         Context contextMock = mock(Context.class);
-        when(contextMock.getLogger()).thenReturn(mock(LambdaLogger.class));
+
         APIGatewayProxyResponseEvent result = questionHandler
                 .handleRequest(mock(APIGatewayProxyRequestEvent.class), contextMock);
 

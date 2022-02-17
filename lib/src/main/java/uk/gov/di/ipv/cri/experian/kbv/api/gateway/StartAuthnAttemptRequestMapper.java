@@ -21,6 +21,8 @@ import java.util.UUID;
 
 public class StartAuthnAttemptRequestMapper {
 
+    public static final String DEFAULT_STRATEGY = "3 out of 4";
+
     public SAARequest mapQuestionRequest(QuestionRequest questionRequest) {
         Objects.requireNonNull(questionRequest, "The QuestionRequest must not be null");
 
@@ -58,7 +60,7 @@ public class StartAuthnAttemptRequestMapper {
         applicationData.setApplicationType("IG");
         applicationData.setChannel("IN");
         applicationData.setSearchConsent("Y");
-        applicationData.setProduct(StringUtils.isNotBlank(strategy) ? strategy : "3 out of 4");
+        applicationData.setProduct(StringUtils.isNotBlank(strategy) ? strategy : DEFAULT_STRATEGY);
         saaRequest.setApplicationData(applicationData);
     }
 
@@ -143,3 +145,4 @@ public class StartAuthnAttemptRequestMapper {
         saaRequest.getLocationDetails().add(locationDetails);
     }
 }
+

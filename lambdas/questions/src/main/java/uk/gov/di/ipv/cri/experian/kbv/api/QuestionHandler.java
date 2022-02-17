@@ -8,6 +8,8 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.lambda.powertools.parameters.ParamManager;
 import software.amazon.lambda.powertools.tracing.CaptureMode;
 import software.amazon.lambda.powertools.tracing.Tracing;
@@ -24,10 +26,10 @@ import java.util.Map;
 public class QuestionHandler
         implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuestionHandler.class);
     private final InputValidationExecutor inputValidationExecutor;
     private final KBVService kbvService;
     private final ObjectMapper objectMapper;
-    private final APIGatewayProxyResponseEvent response;
     public QuestionHandler() {
         this(
                 new ObjectMapper(),
@@ -39,7 +41,7 @@ public class QuestionHandler
 
     public QuestionHandler(
             ObjectMapper objectMapper,
-            KeyStoreService keyStore,
+            KeyStoreService keyStoreService,
             KBVServiceFactory kbvServiceFactory,
             InputValidationExecutor inputValidationExecutor
     )  {
@@ -47,9 +49,8 @@ public class QuestionHandler
         this.objectMapper = objectMapper;
         this.kbvService = kbvServiceFactory.create();
         this.objectMapper.registerModule(new JavaTimeModule());
-        this.response = new APIGatewayProxyResponseEvent();
 
-        persistKeyStoreToSystemProperty(keyStore.getValue(), keyStore.getPassword());
+        persistKeyStoreToSystemProperty(keyStoreService.getKeyStorePath(), keyStoreService.getPassword());
     }
 
     @Override
@@ -57,6 +58,7 @@ public class QuestionHandler
     public APIGatewayProxyResponseEvent handleRequest(
             APIGatewayProxyRequestEvent input, Context context) {
 
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
         response.withHeaders(Map.of("Content-Type", "application/json"));
         try {
             QuestionRequest questionRequest =
@@ -73,10 +75,9 @@ public class QuestionHandler
                 response.withBody(objectMapper.writeValueAsString(validationResult));
             }
         } catch (Exception e) {
-            LambdaLogger logger = context.getLogger();
-            logger.log(String.format("Error occurred when attempting to retrieve questions %s", e));
+            LOGGER.error("Error occurred when attempting to retrieve questions", e);
             response.withStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-            response.withBody("{\"error\": \"" + e + "\"}");
+            response.withBody("{\"error\": \"" + e.getMessage() + "\"}");
         }
 
         return response;

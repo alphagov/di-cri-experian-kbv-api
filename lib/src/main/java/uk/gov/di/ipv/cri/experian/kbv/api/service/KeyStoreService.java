@@ -19,7 +19,7 @@ public class KeyStoreService {
         this.secretsProvider = secretsProvider;
     }
 
-    public String getValue() {
+    public String getKeyStorePath() {
         try {
             String keystoreBase64 = secretsProvider.get(KBV_API_KEYSTORE);
             Path tempFile = Files.createTempFile(null, null);
