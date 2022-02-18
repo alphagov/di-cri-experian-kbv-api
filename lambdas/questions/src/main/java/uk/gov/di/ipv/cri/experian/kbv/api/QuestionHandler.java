@@ -1,7 +1,6 @@
 package uk.gov.di.ipv.cri.experian.kbv.api;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
@@ -19,6 +18,7 @@ import uk.gov.di.ipv.cri.experian.kbv.api.domain.ValidationResult;
 import uk.gov.di.ipv.cri.experian.kbv.api.service.KBVService;
 import uk.gov.di.ipv.cri.experian.kbv.api.service.KBVServiceFactory;
 import uk.gov.di.ipv.cri.experian.kbv.api.service.KeyStoreService;
+import uk.gov.di.ipv.cri.experian.kbv.api.service.KBVSystemProperty;
 import uk.gov.di.ipv.cri.experian.kbv.api.validation.InputValidationExecutor;
 import javax.validation.Validation;
 import java.util.Map;
@@ -30,10 +30,13 @@ public class QuestionHandler
     private final InputValidationExecutor inputValidationExecutor;
     private final KBVService kbvService;
     private final ObjectMapper objectMapper;
+
     public QuestionHandler() {
         this(
                 new ObjectMapper(),
-                new KeyStoreService(ParamManager.getSecretsProvider()),
+                new KBVSystemProperty(
+                    new KeyStoreService(ParamManager.getSecretsProvider())
+                ),
                 new KBVServiceFactory(),
                 new InputValidationExecutor(Validation.buildDefaultValidatorFactory().getValidator())
         );
@@ -41,7 +44,7 @@ public class QuestionHandler
 
     public QuestionHandler(
             ObjectMapper objectMapper,
-            KeyStoreService keyStoreService,
+            KBVSystemProperty systemProperty,
             KBVServiceFactory kbvServiceFactory,
             InputValidationExecutor inputValidationExecutor
     )  {
@@ -50,7 +53,7 @@ public class QuestionHandler
         this.kbvService = kbvServiceFactory.create();
         this.objectMapper.registerModule(new JavaTimeModule());
 
-        persistKeyStoreToSystemProperty(keyStoreService.getKeyStorePath(), keyStoreService.getPassword());
+        systemProperty.save();
     }
 
     @Override
@@ -81,13 +84,5 @@ public class QuestionHandler
         }
 
         return response;
-    }
-
-    private void persistKeyStoreToSystemProperty(String keyStoreValue, String keyStorePassword) {
-        System.setProperty("javax.net.ssl.keyStore", keyStoreValue);
-        System.setProperty("javax.net.ssl.keyStoreType", "pkcs12");
-        System.setProperty(
-                "javax.net.ssl.keyStorePassword",
-                keyStorePassword);
     }
 }

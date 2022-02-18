@@ -19,13 +19,14 @@ import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionsResponse;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.ValidationResult;
 import uk.gov.di.ipv.cri.experian.kbv.api.service.KBVService;
 import uk.gov.di.ipv.cri.experian.kbv.api.service.KBVServiceFactory;
-import uk.gov.di.ipv.cri.experian.kbv.api.service.KeyStoreService;
+import uk.gov.di.ipv.cri.experian.kbv.api.service.KBVSystemProperty;
 import uk.gov.di.ipv.cri.experian.kbv.api.validation.InputValidationExecutor;
 
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -35,18 +36,17 @@ class QuestionHandlerTest {
     @Mock private KBVServiceFactory kbvServiceFactoryMock;
     @Mock private KBVService kbvServiceMock;
     @Mock private ObjectMapper objectMapperMock;
-    @Mock private KeyStoreService keyStoreServiceMock;
+    @Mock private KBVSystemProperty systemPropertyMock;
     @Mock private InputValidationExecutor inputValidationExecutorMock;
 
     @BeforeEach
     void setUp() {
         AWSXRay.setGlobalRecorder(AWSXRayRecorderBuilder.standard().withContextMissingStrategy(new LogErrorContextMissingStrategy()).build());
         when(kbvServiceFactoryMock.create()).thenReturn(kbvServiceMock);
-        when(keyStoreServiceMock.getKeyStorePath()).thenReturn("keystore-value");
-        when(keyStoreServiceMock.getPassword()).thenReturn("keystore-password");
+        doNothing().when(systemPropertyMock).save();
         questionHandler = new QuestionHandler(
                 objectMapperMock,
-                keyStoreServiceMock,
+                systemPropertyMock,
                 kbvServiceFactoryMock,
                 inputValidationExecutorMock
         );
@@ -80,9 +80,11 @@ class QuestionHandlerTest {
         APIGatewayProxyRequestEvent input = mock(APIGatewayProxyRequestEvent.class);
         ValidationResult validationResultMock = mock(ValidationResult.class);
 
-        when(inputValidationExecutorMock.performInputValidation(questionRequest.getUrn())).thenReturn(validationResultMock);
         when(objectMapperMock.readValue(input.getBody(), QuestionRequest.class)).thenReturn(questionRequest);
         when(objectMapperMock.writeValueAsString(validationResultMock)).thenReturn(badResponseBody);
+        when(inputValidationExecutorMock.performInputValidation(questionRequest.getPersonIdentity())).thenReturn(validationResultMock);
+        when(validationResultMock.isValid()).thenReturn(false);
+
 
         APIGatewayProxyResponseEvent result = questionHandler
                 .handleRequest(input, mock(Context.class));
