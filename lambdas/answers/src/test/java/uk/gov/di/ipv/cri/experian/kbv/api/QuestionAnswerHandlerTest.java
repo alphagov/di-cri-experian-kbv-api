@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionRequest;
+import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionAnswerRequest;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.QuestionsResponse;
 import uk.gov.di.ipv.cri.experian.kbv.api.domain.ValidationResult;
 import uk.gov.di.ipv.cri.experian.kbv.api.service.KBVService;
@@ -31,8 +31,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class QuestionHandlerTest {
-    private QuestionHandler questionHandler;
+class QuestionAnswerHandlerTest {
+    private QuestionAnswerHandler questionAnswerHandler;
     @Mock private KBVServiceFactory kbvServiceFactoryMock;
     @Mock private KBVService kbvServiceMock;
     @Mock private ObjectMapper objectMapperMock;
@@ -44,7 +44,7 @@ class QuestionHandlerTest {
         AWSXRay.setGlobalRecorder(AWSXRayRecorderBuilder.standard().withContextMissingStrategy(new LogErrorContextMissingStrategy()).build());
         when(kbvServiceFactoryMock.create()).thenReturn(kbvServiceMock);
         doNothing().when(systemPropertyMock).save();
-        questionHandler = new QuestionHandler(
+        questionAnswerHandler = new QuestionAnswerHandler(
                 objectMapperMock,
                 systemPropertyMock,
                 kbvServiceFactoryMock,
@@ -54,18 +54,18 @@ class QuestionHandlerTest {
 
     @Test
     void shouldReturn200OkWhenInputIsValid() throws JsonProcessingException {
-        final String goodResponseBody = "question-response";
-        QuestionRequest questionRequest = mock(QuestionRequest.class);
+        final String goodResponseBody = "answer-response";
+        QuestionAnswerRequest questionAnswerRequest = mock(QuestionAnswerRequest.class);
         APIGatewayProxyRequestEvent input = mock(APIGatewayProxyRequestEvent.class);
         ValidationResult validationResultMock = mock(ValidationResult.class);
         QuestionsResponse questionsResponse = new QuestionsResponse();
 
-        when(objectMapperMock.readValue(input.getBody(), QuestionRequest.class)).thenReturn(questionRequest);
-        when(kbvServiceMock.getQuestions(questionRequest)).thenReturn(questionsResponse);
+        when(objectMapperMock.readValue(input.getBody(), QuestionAnswerRequest.class)).thenReturn(questionAnswerRequest);
+        when(kbvServiceMock.submitAnswers(questionAnswerRequest)).thenReturn(questionsResponse);
         when(objectMapperMock.writeValueAsString(questionsResponse)).thenReturn(goodResponseBody);
-        when(inputValidationExecutorMock.performInputValidation(questionRequest.getPersonIdentity())).thenReturn(validationResultMock);
+        when(inputValidationExecutorMock.performInputValidation(questionAnswerRequest)).thenReturn(validationResultMock);
         when(validationResultMock.isValid()).thenReturn(true);
-        APIGatewayProxyResponseEvent result = questionHandler
+        APIGatewayProxyResponseEvent result = questionAnswerHandler
                 .handleRequest(input, mock(Context.class));
 
         assertEquals(Map.of("Content-Type", "application/json"), result.getHeaders());
@@ -76,17 +76,17 @@ class QuestionHandlerTest {
     @Test
     void shouldReturn400BadRequestWhenInputInValid() throws JsonProcessingException {
         final String badResponseBody = "bad-response";
-        QuestionRequest questionRequest = mock(QuestionRequest.class);
+        QuestionAnswerRequest questionAnswerRequest = mock(QuestionAnswerRequest.class);
         APIGatewayProxyRequestEvent input = mock(APIGatewayProxyRequestEvent.class);
         ValidationResult validationResultMock = mock(ValidationResult.class);
 
-        when(objectMapperMock.readValue(input.getBody(), QuestionRequest.class)).thenReturn(questionRequest);
+        when(inputValidationExecutorMock.performInputValidation(questionAnswerRequest)).thenReturn(validationResultMock);
+        when(objectMapperMock.readValue(input.getBody(), QuestionAnswerRequest.class)).thenReturn(questionAnswerRequest);
         when(objectMapperMock.writeValueAsString(validationResultMock)).thenReturn(badResponseBody);
-        when(inputValidationExecutorMock.performInputValidation(questionRequest.getPersonIdentity())).thenReturn(validationResultMock);
         when(validationResultMock.isValid()).thenReturn(false);
 
 
-        APIGatewayProxyResponseEvent result = questionHandler
+        APIGatewayProxyResponseEvent result = questionAnswerHandler
                 .handleRequest(input, mock(Context.class));
 
         assertEquals(Map.of("Content-Type", "application/json"), result.getHeaders());
@@ -95,10 +95,9 @@ class QuestionHandlerTest {
     }
 
     @Test
-    void shouldReturn500ErrorWhenAServerErrorOccurs() {
+    void shouldReturn500ErrorWhenGeneratedAtTheServer() {
         Context contextMock = mock(Context.class);
-
-        APIGatewayProxyResponseEvent result = questionHandler
+        APIGatewayProxyResponseEvent result = questionAnswerHandler
                 .handleRequest(mock(APIGatewayProxyRequestEvent.class), contextMock);
 
         assertEquals(Map.of("Content-Type", "application/json"), result.getHeaders());

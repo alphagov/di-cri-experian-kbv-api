@@ -3,11 +3,12 @@ package uk.gov.di.ipv.cri.experian.kbv.api.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.lambda.powertools.parameters.SecretsProvider;
-
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.UUID;
 
 public class KeyStoreService {
     private final SecretsProvider secretsProvider;
@@ -21,11 +22,11 @@ public class KeyStoreService {
 
     public String getKeyStorePath() {
         try {
-            String keystoreBase64 = secretsProvider.get(KBV_API_KEYSTORE);
-            Path tempFile = Files.createTempFile(null, null);
-            Files.write(tempFile, Base64.getDecoder().decode(keystoreBase64));
+            File file = Files.createTempFile(UUID.randomUUID().toString(), ".tmp").toFile();
+            Path tempFile = file.toPath();
+            Files.write(tempFile, Base64.getDecoder().decode(secretsProvider.get(KBV_API_KEYSTORE)));
             return tempFile.toString();
-        } catch (IOException e) {
+        } catch (NullPointerException | IOException e) {
             LOGGER.error("Initialisation failed", e);
             return null;
         }
