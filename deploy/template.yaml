@@ -12,9 +12,9 @@ Globals:
     Tracing: Active
     VpcConfig:
       SecurityGroupIds:
-        - sg-03a1efaf2fed58442
+        - sg-0baf479c53ac54f59
       SubnetIds:
-        - subnet-07fcf55b165be35ed
+        - subnet-08cd07453da63f873
 
 Parameters:
   Environment:
@@ -30,13 +30,33 @@ Parameters:
 
 Resources:
 
-  KbvApi:
+  ExperianKbvApi:
     Type: AWS::Serverless::Api
     Properties:
-      OpenApiVersion: 3.0.1
+      MethodSettings:
+        - LoggingLevel: INFO
+          ResourcePath: '/*'
+          HttpMethod: '*'
+      AccessLogSetting:
+        Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "caller":"$context.identity.caller", "user":"$context.identity.user","requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath", "status":"$context.status","protocol":"$context.protocol", "responseLength":"$context.responseLength" }'
+      TracingEnabled: true
+      Name: !Sub "ExperianKbvApi-${Environment}"
       StageName: !Ref Environment
+      OpenApiVersion: 3.0.1
+      DefinitionBody:
+        openapi: "3.0.1" # workaround to get `sam validate` to work
+        paths: # workaround to get `sam validate` to work
+          /never-created:
+            options: { } # workaround to get `sam validate` to work
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: './api.yaml'
+      EndpointConfiguration:
+        Type: REGIONAL
 
-  KbvQuestionRetrievalFunction:
+
+  ExperianKbvQuestionRetrievalFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ../lambdas/questions
@@ -52,16 +72,16 @@ Resources:
               Effect: Allow
               Action:
                 - 'secretsmanager:GetSecretValue'
-              Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/di-ipv-cri-experian-kbv-api*'
+              Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/di-ipv-cri-experian-kbv-api/experian*'
       Events:
         RetrieveQuestions:
           Type: Api
           Properties:
-            Path: /question-request
+            Path: /question_request
             Method: post
-            RestApiId: !Ref KbvApi
+            RestApiId: !Ref ExperianKbvApi
 
-  KbvQuestionAnswerFunction:
+  ExperianKbvQuestionAnswerFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ../lambdas/answers
@@ -77,34 +97,34 @@ Resources:
               Effect: Allow
               Action:
                 - 'secretsmanager:GetSecretValue'
-              Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/di-ipv-cri-experian-kbv-api*'
+              Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/di-ipv-cri-experian-kbv-api/experian*'
       Events:
         RetrieveQuestions:
           Type: Api
           Properties:
-            Path: /question-answer
+            Path: /question_answer
             Method: post
-            RestApiId: !Ref KbvApi
+            RestApiId: !Ref ExperianKbvApi
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  KbvQuestionRetrievalApi:
+  ExperianKbvQuestionRetrievalApi:
     Description: "API Gateway endpoint URL for Prod stage for question retrieval function"
-    Value: !Sub "https://${KbvApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question-request/"
-  KbvQuestionRetrievalFunction:
+    Value: !Sub "https://${ExperianKbvApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question_request/"
+  ExperianKbvQuestionRetrievalFunction:
     Description: "Question retrieval lambda function ARN"
-    Value: !GetAtt KbvQuestionRetrievalFunction.Arn
-  KbvQuestionRetrievalFunctionIamRole:
+    Value: !GetAtt ExperianKbvQuestionRetrievalFunction.Arn
+  ExperianKbvQuestionRetrievalFunctionIamRole:
     Description: "Implicit IAM Role created for question retrieval function"
-    Value: !GetAtt KbvQuestionRetrievalFunction.Arn
-  KbvQuestionAnswerApi:
+    Value: !GetAtt ExperianKbvQuestionRetrievalFunction.Arn
+  ExperianKbvQuestionAnswerApi:
     Description: "API Gateway endpoint URL for Prod stage for question answer function"
-    Value: !Sub "https://${KbvApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question-answer/"
-  KbvQuestionAnswerFunction:
+    Value: !Sub "https://${ExperianKbvApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question_answer/"
+  ExperianKbvQuestionAnswerFunction:
     Description: "Question answer lambda function ARN"
-    Value: !GetAtt KbvQuestionAnswerFunction.Arn
-  KbvQuestionAnswerFunctionIamRole:
+    Value: !GetAtt ExperianKbvQuestionAnswerFunction.Arn
+  ExperianKbvQuestionAnswerFunctionIamRole:
     Description: "Implicit IAM Role created for question answer function"
-    Value: !GetAtt KbvQuestionAnswerFunction.Arn
+    Value: !GetAtt ExperianKbvQuestionAnswerFunction.Arn
