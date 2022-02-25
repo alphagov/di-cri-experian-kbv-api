@@ -7,7 +7,7 @@ x-amazon-apigateway-request-validators:
     validateRequestBody: true
     validateRequestParameters: false
 paths:
-  /question_request:
+  /question-request:
     post:
       responses:
         "201":
@@ -28,13 +28,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+      x-amazon-apigateway-request-validators: "Validate body"
       x-amazon-apigateway-integration:
         type: "aws_proxy"
         httpMethod: "POST"
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ExperianKbvQuestionRetrievalFunction.Arn}/invocations"
         passthroughBehavior: "when_no_match"
-  /question_answer:
+  /question-answer:
     post:
       responses:
         "201":
@@ -55,6 +56,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+      x-amazon-apigateway-request-validators: "Validate body"
       x-amazon-apigateway-integration:
         type: "aws_proxy"
         httpMethod: "POST"

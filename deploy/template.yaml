@@ -77,7 +77,7 @@ Resources:
         RetrieveQuestions:
           Type: Api
           Properties:
-            Path: /question_request
+            Path: /question-request
             Method: post
             RestApiId: !Ref ExperianKbvApi
 
@@ -102,7 +102,7 @@ Resources:
         RetrieveQuestions:
           Type: Api
           Properties:
-            Path: /question_answer
+            Path: /question-answer
             Method: post
             RestApiId: !Ref ExperianKbvApi
 
@@ -112,7 +112,7 @@ Outputs:
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   ExperianKbvQuestionRetrievalApi:
     Description: "API Gateway endpoint URL for Prod stage for question retrieval function"
-    Value: !Sub "https://${ExperianKbvApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question_request/"
+    Value: !Sub "https://${ExperianKbvApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question-request/"
   ExperianKbvQuestionRetrievalFunction:
     Description: "Question retrieval lambda function ARN"
     Value: !GetAtt ExperianKbvQuestionRetrievalFunction.Arn
@@ -121,7 +121,7 @@ Outputs:
     Value: !GetAtt ExperianKbvQuestionRetrievalFunction.Arn
   ExperianKbvQuestionAnswerApi:
     Description: "API Gateway endpoint URL for Prod stage for question answer function"
-    Value: !Sub "https://${ExperianKbvApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question_answer/"
+    Value: !Sub "https://${ExperianKbvApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/question-answer/"
   ExperianKbvQuestionAnswerFunction:
     Description: "Question answer lambda function ARN"
     Value: !GetAtt ExperianKbvQuestionAnswerFunction.Arn
