@@ -10,11 +10,6 @@ Globals:
     Runtime: java11
     MemorySize: 512
     Tracing: Active
-    VpcConfig:
-      SecurityGroupIds:
-        - sg-0baf479c53ac54f59
-      SubnetIds:
-        - subnet-08cd07453da63f873
 
 Parameters:
   Environment:
@@ -27,6 +22,14 @@ Parameters:
       - integration
       - prod
     ConstraintDescription: specify dev, staging, integration or prod for environment
+
+Mappings:
+  Environments:
+    dev:
+      Subnets:
+        - subnet-08cd07453da63f873
+      SecurityGroup:
+        - sg-0baf479c53ac54f59
 
 Resources:
 
@@ -73,6 +76,9 @@ Resources:
               Action:
                 - 'secretsmanager:GetSecretValue'
               Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/di-ipv-cri-experian-kbv-api/experian*'
+      VpcConfig:
+        SecurityGroupIds: !FindInMap [ Environments, !Ref Environment, SecurityGroup ]
+        SubnetIds: !FindInMap [ Environments, !Ref Environment, Subnets ]
       Events:
         RetrieveQuestions:
           Type: Api
@@ -98,6 +104,9 @@ Resources:
               Action:
                 - 'secretsmanager:GetSecretValue'
               Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/di-ipv-cri-experian-kbv-api/experian*'
+      VpcConfig:
+        SecurityGroupIds: !FindInMap [ Environments, !Ref Environment, SecurityGroup ]
+        SubnetIds: !FindInMap [ Environments, !Ref Environment, Subnets ]
       Events:
         RetrieveQuestions:
           Type: Api

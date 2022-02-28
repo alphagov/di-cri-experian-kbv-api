@@ -54,7 +54,7 @@ class KBVGatewayTest {
 
     @Test
     void shouldCallSubmitAnswersSuccessfully() throws InterruptedException {
-        // final String testRequestBody = "serialisedExperianKbvApiRequest";
+        // final String testRequestBody = "serialisedKbvApiRequest";
         QuestionAnswerRequest questionAnswerRequest =
                 TestDataCreator.createTestQuestionAnswerRequest();
 
@@ -80,7 +80,7 @@ class KBVGatewayTest {
         // assertEquals(TEST_API_RESPONSE_BODY, questionAnswerRequestResult);
         verify(mockResponseToQuestionMapper).mapQuestionAnswersRtqRequest(questionAnswerRequest);
         // verify(mockObjectMapper).writeValueAsString(mockRtqRequest);
-        // verify(mockExperianKbvApiConfig).getEndpointUri();
+        // verify(mockKbvApiConfig).getEndpointUri();
         // assertEquals(testEndpointUri, httpRequestCaptor.getValue().uri().toString());
         // assertEquals("POST", httpRequestCaptor.getValue().method());
         // HttpHeaders capturedHttpRequestHeaders = httpRequestCaptor.getValue().headers();
@@ -103,7 +103,7 @@ class KBVGatewayTest {
                                 null,
                                 mock(ResponseToQuestionMapper.class),
                                 mock(IdentityIQWebServiceSoap.class)),
-                        "ExperianKbvApiConfig must not be null",
+                        "kbvApiConfig must not be null",
                         new KBVGatewayTest.KbvGatewayContructorArgs(
                                 null,
                                 mock(ResponseToQuestionMapper.class),
